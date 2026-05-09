@@ -1,0 +1,3659 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EXTREME3D Manager</title>
+<meta name="description" content="Sistema de gestão profissional para impressão 3D">
+<meta name="theme-color" content="#321C05">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="EXTREME3D">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Great+Vibes&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Raleway:wght@100;200;300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #321C05;
+    --surface: #3d2206;
+    --surface2: #4a2a08;
+    --border: rgba(200,131,10,0.25);
+    --accent: #C8830A;
+    --accent2: #C8830A;
+    --accent3: #e6a020;
+    --text: #ffffff;
+    --muted: rgba(255,255,255,0.5);
+    --danger: #ff4d6d;
+    --success: #C8830A;
+    --brand-dark: #321C05;
+    --brand-amber: #C8830A;
+    --brand-white: #ffffff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #321C05;
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+  }
+  /* SIDEBAR */
+  .sidebar {
+    width: 240px;
+    min-height: 100vh;
+    background: var(--brand-dark);
+    border-right: 1px solid rgba(200,131,10,0.2);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    padding: 28px 16px 20px;
+    border-bottom: 1px solid rgba(200,131,10,0.2);
+    text-align: center;
+  }
+
+  .logo h1 {
+    font-family: 'Raleway', sans-serif;
+    font-size: 1rem;
+    font-weight: 200;
+    letter-spacing: 0.45em;
+    text-transform: uppercase;
+    color: #ffffff;
+    line-height: 1;
+    white-space: nowrap;
+    text-indent: 0.45em;
+  }
+
+  .logo-text {
+    font-family: 'Raleway', sans-serif;
+    font-size: 1rem;
+    font-weight: 200;
+    letter-spacing: 0.45em;
+    color: #ffffff;
+    vertical-align: middle;
+    line-height: 1;
+    font-variant-numeric: normal;
+    font-feature-settings: 'lnum' 1;
+  }
+
+  .logo h1 span { display: inline; }
+
+  .logo-tagline {
+    font-family: 'Great Vibes', cursive;
+    font-size: 0.82rem;
+    color: var(--brand-amber);
+    margin-top: 6px;
+    letter-spacing: 0.5px;
+  }
+
+  .nav { padding: 16px 12px; flex: 1; }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.45);
+    transition: all 0.2s;
+    margin-bottom: 2px;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+  }
+
+  .nav-item:hover { background: rgba(200,131,10,0.12); color: var(--text); }
+  .nav-item.active { background: rgba(200,131,10,0.25); color: #fff; border-left: 3px solid #C8830A; padding-left: 9px; }
+  .nav-item .icon { font-size: 1.4rem; width: 20px; text-align: center; line-height: 1; color: rgba(200,131,10,0.5); }
+  .nav-item.active .icon { color: #fff; }
+
+  /* MAIN */
+  .main {
+    margin-left: 240px;
+    flex: 1;
+    min-height: 100vh;
+    padding: 32px;
+  }
+
+  .page { display: none; }
+  .page.active { display: block; }
+
+  .page-header {
+    margin-bottom: 28px;
+  }
+
+  .page-header h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    font-family: 'Cormorant Garamond', serif;
+    color: #ffffff;
+  }
+
+  .page-header p { color: rgba(255,255,255,0.45); font-size: 0.88rem; margin-top: 4px; font-family: 'Cormorant Garamond', serif; font-style: italic; }
+
+  /* CARDS */
+  .cards-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(200,131,10,0.2);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+  }
+
+  .card.orange::before { background: #C8830A; }
+  .card.green::before { background: #C8830A; }
+  .card.purple::before { background: rgba(200,131,10,0.6); }
+  .card.red::before { background: #ff4d6d; }
+
+  .card-label { font-size: 0.75rem; font-family: 'JetBrains Mono', monospace; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; }
+  .card-value { font-size: 1.7rem; font-weight: 800; margin-top: 6px; font-family: 'Cormorant Garamond', serif; }
+  .card-sub { font-size: 0.78rem; color: rgba(255,255,255,0.45); margin-top: 4px; }
+
+  /* TABLE */
+  .table-wrap {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(200,131,10,0.2);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .table-header {
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(200,131,10,0.12);
+  }
+
+  .table-header h3 { font-size: 1rem; font-weight: 700; font-family: 'Cormorant Garamond', serif; color: #fff; }
+
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    text-align: left;
+    padding: 12px 20px;
+    font-size: 0.72rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: rgba(255,255,255,0.45);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    background: rgba(200,131,10,0.12);
+    border-bottom: 1px solid rgba(200,131,10,0.2);
+  }
+
+  td {
+    padding: 13px 20px;
+    font-size: 0.88rem;
+    border-bottom: 1px solid rgba(200,131,10,0.12);
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(200,131,10,0.12); }
+
+  /* BUTTONS */
+  .btn {
+    padding: 8px 16px;
+    border-radius: 7px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 0.83rem;
+    transition: all 0.2s;
+  }
+
+  .btn-primary { background: #C8830A; color: #fff; }
+  .btn-primary:hover { background: #a66c08; }
+  .btn-success { background: #C8830A; color: #fff; }
+  .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
+  .btn-danger:hover { background: var(--danger); color: #fff; }
+  .btn-ghost { background: transparent; color: rgba(255,255,255,0.6); border: 1px solid rgba(200,131,10,0.3); }
+  .btn-ghost:hover { color: #fff; border-color: #C8830A; }
+  .btn-sm { padding: 5px 10px; font-size: 0.78rem; }
+
+  .btn-row { display: flex; gap: 8px; }
+
+  /* BADGE */
+  .badge {
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .badge-green { background: rgba(200,131,10,0.18); color: #C8830A; }
+  .badge-orange { background: rgba(255,107,53,0.15); color: #C8830A; }
+  .badge-amber { background: rgba(200,131,10,0.15); color: #C8830A; }
+  .badge-purple { background: rgba(200,131,10,0.15); color: #C8830A; }
+  .badge-red { background: rgba(255,77,109,0.15); color: var(--danger); }
+  .badge-gray { background: rgba(122,122,144,0.15); color: rgba(255,255,255,0.45); }
+
+  /* MODAL */
+  .modal-bg {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-bg.open { display: flex; }
+
+  .modal {
+    background: #2a1504;
+    border: 1px solid rgba(200,131,10,0.3);
+    border-radius: 16px;
+    padding: 28px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .modal h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 20px; letter-spacing: -0.2px; }
+
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: 0.72rem; color: rgba(255,255,255,0.45); font-family: 'Inter', sans-serif; font-weight: 600; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.7px; }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 10px 14px;
+    background: rgba(200,131,10,0.12);
+    border: 1px solid rgba(200,131,10,0.2);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 500;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus { border-color: #C8830A; }
+
+  .form-group textarea { resize: vertical; min-height: 80px; }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+
+  /* FILAMENT BAR */
+  .filament-bar {
+    height: 6px;
+    background: rgba(200,131,10,0.12);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-top: 6px;
+  }
+
+  .filament-bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.6s ease;
+  }
+
+  /* COLOR DOT */
+  .color-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+    vertical-align: middle;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+
+  /* GRID PECAS */
+  .pecas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+  }
+
+  .peca-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(200,131,10,0.2);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+    cursor: pointer;
+  }
+
+  .peca-card:hover { border-color: #C8830A; transform: translateY(-2px); }
+
+  .peca-thumb {
+    width: 100%;
+    aspect-ratio: 4/3;
+    background: rgba(200,131,10,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+  }
+
+  .peca-info { padding: 14px; }
+  .peca-name { font-weight: 700; font-size: 0.92rem; }
+  .peca-meta { font-size: 0.78rem; color: rgba(255,255,255,0.45); margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
+  .peca-price { font-size: 1rem; font-weight: 800; color: #C8830A; margin-top: 8px; }
+  .peca-actions { display: flex; gap: 6px; margin-top: 10px; }
+
+  /* VENDA CALC */
+  .calc-box {
+    background: rgba(200,131,10,0.12);
+    border: 1px solid rgba(200,131,10,0.2);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .calc-box h4 { font-size: 0.85rem; color: rgba(255,255,255,0.45); font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; }
+
+  .calc-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid rgba(200,131,10,0.12); font-size: 0.88rem; }
+  .calc-row:last-child { border-bottom: none; }
+  .calc-row.total { font-weight: 800; font-size: 1rem; color: #C8830A; }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 48px 20px;
+    color: rgba(255,255,255,0.4);
+  }
+
+  .empty-state .es-icon { font-size: 3rem; margin-bottom: 12px; }
+  .empty-state p { font-size: 0.9rem; margin-bottom: 16px; }
+
+  /* SECTION SPACING */
+  .section { margin-bottom: 28px; }
+
+  /* TABS */
+  .tabs { display: flex; gap: 4px; margin-bottom: 20px; }
+  .tab {
+    padding: 8px 16px;
+    border-radius: 7px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    background: rgba(200,131,10,0.12);
+    color: rgba(255,255,255,0.45);
+    transition: all 0.2s;
+  }
+  .tab.active { background: #C8830A; color: #fff; }
+
+  /* PROFIT INDICATOR */
+  .profit-positive { color: #C8830A; }
+  .profit-negative { color: #ff6b6b; }
+
+  .periodo-btn.active { background: #C8830A; color: #fff; border-color: #C8830A; }
+  .an-btn { padding:8px 14px;border-radius:7px;border:1px solid rgba(200,131,10,0.2);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.45);font-family:'Inter',sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer;transition:all 0.2s; }
+  .an-btn:hover { color:#ffffff;border-color:#ffffff; }
+  .an-btn.active { background:#C8830A;color:#fff;border-color:#C8830A; }
+  .an-bar-wrap { flex:1;display:flex;flex-direction:column;align-items:center;min-width:0; }
+  .an-bar { width:100%;border-radius:4px 4px 0 0;transition:height 0.4s ease;cursor:pointer;min-height:2px; }
+  .an-bar:hover { filter:brightness(1.2); }
+  .an-bar-val { font-size:0.65rem;color:rgba(255,255,255,0.45);margin-top:3px;font-family:'JetBrains Mono',monospace;text-align:center;white-space:nowrap; }
+  .an-bar-label { font-size:0.72rem;color:rgba(255,255,255,0.45);text-align:center;margin-top:4px;font-weight:600; }
+  .an-mes-card { background:rgba(255,255,255,0.04);border:1px solid rgba(200,131,10,0.2);border-radius:10px;padding:16px;transition:border-color 0.2s; }
+  .an-mes-card:hover { border-color:#C8830A; }
+  .an-mes-card.melhor { border-color:#C8830A; }
+  .an-mes-card.pior { border-color:var(--danger); }
+
+  .quick-action {
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:8px;padding:16px 10px;
+    background:rgba(255,255,255,0.04);border:1px solid rgba(200,131,10,0.2);border-radius:10px;
+    cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif;
+  }
+  .quick-action:hover { border-color:#C8830A;background:rgba(200,131,10,0.1);transform:translateY(-2px); }
+  .qa-icon { font-size:1.5rem; }
+  .qa-label { font-size:0.78rem;font-weight:600;color:rgba(255,255,255,0.45);text-align:center; }
+  .quick-action:hover .qa-label { color:#ffffff; }
+
+  .venda-tab {
+    padding:10px 18px;border:none;border-bottom:2px solid transparent;
+    background:none;color:rgba(255,255,255,0.45);font-family:'Inter',sans-serif;
+    font-size:0.85rem;font-weight:600;cursor:pointer;transition:all 0.2s;margin-bottom:-1px;
+  }
+  .venda-tab:hover { color:#fff; }
+  .venda-tab.active { color:#C8830A;border-bottom-color:#C8830A; }
+
+  .orc-card {
+    background:rgba(255,255,255,0.04);border:1px solid rgba(200,131,10,0.2);border-radius:12px;
+    padding:20px;margin-bottom:14px;transition:border-color 0.2s;
+  }
+  .orc-card:hover { border-color:#C8830A; }
+  .orc-card.aprovado { border-left:3px solid #C8830A; }
+  .orc-card.pendente { border-left:3px solid #e6a020; }
+  .orc-card.recusado { border-left:3px solid var(--danger); }
+
+  select option { background: rgba(200,131,10,0.12); }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #321C05; }
+  ::-webkit-scrollbar-thumb { background: rgba(200,131,10,0.4); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo">
+    <h1><span class="logo-text">EXTREME&nbsp;3D</span></h1>
+    <p class="logo-tagline">você imagina. a gente imprime.</p>
+  </div>
+  <nav class="nav">
+    <button class="nav-item active" onclick="navigate('dashboard')">
+      <span class="icon">•</span> Dashboard
+    </button>
+    <button class="nav-item" onclick="navigate('filamentos')">
+      <span class="icon">•</span> Filamentos
+    </button>
+    <button class="nav-item" onclick="navigate('pecas')">
+      <span class="icon">•</span> Catálogo de Peças
+    </button>
+    <button class="nav-item" onclick="navigate('vendas')">
+      <span class="icon">•</span> Vendas
+    </button>
+    <button class="nav-item" onclick="navigate('impressoes')">
+      <span class="icon">•</span> Impressões
+    </button>
+    <button class="nav-item" onclick="navigate('gastos')">
+      <span class="icon">•</span> Gastos
+    </button>
+    <button class="nav-item" onclick="navigate('dre')">
+      <span class="icon">•</span> DRE
+    </button>
+    <button class="nav-item" onclick="navigate('analise')">
+      <span class="icon">•</span> Análise Mensal
+    </button>
+    <button class="nav-item" onclick="navigate('calcular')">
+      <span class="icon">•</span> Calculadora
+    </button>
+  </nav>
+
+  <!-- BOTÃO SALVAR -->
+  <div style="padding:16px 12px;border-top:1px solid rgba(200,131,10,0.15);">
+    <button id="btn-salvar" onclick="salvarManual()" style="
+      width:100%;padding:12px;border-radius:8px;border:none;
+      background:#C8830A;color:#fff;
+      font-family:'Inter',sans-serif;font-size:0.88rem;font-weight:700;
+      cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;
+      border:none;letter-spacing:0.5px;">
+      💾 Salvar Dados
+    </button>
+    <div id="save-status" style="text-align:center;font-size:0.7rem;color:rgba(255,255,255,0.45);margin-top:6px;font-family:'JetBrains Mono',monospace;">
+      Nunca salvo
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+
+  <div id="page-dashboard" class="page active">
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <div>
+        <h2>Dashboard</h2>
+        <p>Visão geral do seu negócio de impressão 3D</p>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-ghost" onclick="exportarDados()" title="Exportar backup dos dados">💾 Backup</button>
+        <button class="btn btn-ghost" onclick="document.getElementById('import-file').click()" title="Importar backup">📂 Restaurar</button>
+        <button class="btn btn-ghost" onclick="limparTodosDados()" title="Apagar todos os dados" style="color:var(--danger);border-color:var(--danger);">🗑️ Limpar Dados</button>
+        <input type="file" id="import-file" accept=".json" style="display:none" onchange="importarDados(event)">
+      </div>
+    </div>
+
+    <div class="cards-row" id="dash-cards">
+      <!-- filled by JS -->
+    </div>
+
+    <!-- ATALHOS RÁPIDOS -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:24px;">
+      <button class="quick-action" onclick="openModal('modal-venda')">
+        <span class="qa-icon">💰</span>
+        <span class="qa-label">Nova Venda</span>
+      </button>
+      <button class="quick-action" onclick="openModal('modal-impressao')">
+        <span class="qa-icon">🖨️</span>
+        <span class="qa-label">Nova Impressão</span>
+      </button>
+      <button class="quick-action" onclick="openModal('modal-orcamento')">
+        <span class="qa-icon">📄</span>
+        <span class="qa-label">Novo Orçamento</span>
+      </button>
+      <button class="quick-action" onclick="openModal('modal-gasto')">
+        <span class="qa-icon">💸</span>
+        <span class="qa-label">Registrar Gasto</span>
+      </button>
+      <button class="quick-action" onclick="openModal('modal-reabastecer')">
+        <span class="qa-icon">📦</span>
+        <span class="qa-label">Reabastecer</span>
+      </button>
+      <button class="quick-action" onclick="navigate('calcular')">
+        <span class="qa-icon">🧮</span>
+        <span class="qa-label">Calcular Preço</span>
+      </button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <div class="table-wrap">
+        <div class="table-header">
+          <h3>Últimas Vendas</h3>
+        </div>
+        <div id="dash-vendas-recentes"></div>
+      </div>
+      <div class="table-wrap">
+        <div class="table-header">
+          <h3>Filamentos com Estoque Baixo</h3>
+        </div>
+        <div id="dash-filamentos-baixo"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILAMENTOS -->
+  <div id="page-filamentos" class="page">
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <div>
+        <h2>Filamentos</h2>
+        <p>Controle de estoque, consumo e custos</p>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-ghost" onclick="openModal('modal-reabastecer')">📦 Reabastecer</button>
+        <button class="btn btn-primary" onclick="openModal('modal-filamento')">+ Novo Filamento</button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-header">
+        <h3>Estoque de Filamentos</h3>
+        <span id="fil-count" style="font-size:0.8rem;color:rgba(255,255,255,0.45);font-family:'JetBrains Mono',monospace;"></span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Nome / Marca</th>
+            <th>Tipo</th>
+            <th>Cor</th>
+            <th>Estoque (kg)</th>
+            <th>Custo/kg</th>
+            <th>Custo/g</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="fil-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PECAS -->
+  <div id="page-pecas" class="page">
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <div>
+        <h2>Catálogo de Peças</h2>
+        <p>Todos os modelos que você produz</p>
+      </div>
+      <button class="btn btn-primary" onclick="openModal('modal-peca')">+ Nova Peça</button>
+    </div>
+    <div class="pecas-grid" id="pecas-grid"></div>
+  </div>
+
+  <!-- VENDAS -->
+  <div id="page-vendas" class="page">
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <div>
+        <h2>Vendas</h2>
+        <p>Histórico, orçamentos e controle financeiro</p>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-ghost" onclick="abrirAbaVendas('orcamentos');openModal('modal-orcamento')">📄 Novo Orçamento</button>
+        <button class="btn btn-primary" onclick="openModal('modal-venda')">+ Registrar Venda</button>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div style="display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid rgba(200,131,10,0.15);padding-bottom:0;">
+      <button class="venda-tab active" id="tab-vendas-hist" onclick="abrirAbaVendas('historico')">💰 Histórico de Vendas</button>
+      <button class="venda-tab" id="tab-vendas-orc" onclick="abrirAbaVendas('orcamentos')">📄 Orçamentos</button>
+    </div>
+
+    <!-- ABA HISTÓRICO -->
+    <div id="aba-historico">
+
+    <div style="display:flex;gap:10px;margin-bottom:20px;align-items:center;flex-wrap:wrap;">
+      <span style="font-size:0.8rem;color:rgba(255,255,255,0.45);font-weight:600;">FILTRAR POR PERÍODO:</span>
+      <button class="btn btn-ghost btn-sm periodo-btn active" onclick="filtrarPeriodo('tudo',this)">Tudo</button>
+      <button class="btn btn-ghost btn-sm periodo-btn" onclick="filtrarPeriodo('hoje',this)">Hoje</button>
+      <button class="btn btn-ghost btn-sm periodo-btn" onclick="filtrarPeriodo('semana',this)">Esta Semana</button>
+      <button class="btn btn-ghost btn-sm periodo-btn" onclick="filtrarPeriodo('mes',this)">Este Mês</button>
+      <button class="btn btn-ghost btn-sm periodo-btn" onclick="filtrarPeriodo('ano',this)">Este Ano</button>
+    </div>
+
+    <div class="cards-row" id="vendas-cards"></div>
+
+    <div class="table-wrap">
+      <div class="table-header">
+        <h3>Histórico de Vendas</h3>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Peça / Produto</th>
+            <th>Qtd</th>
+            <th>Custo</th>
+            <th>Vendido por</th>
+            <th>Lucro</th>
+            <th>Pagamento</th>
+            <th>Status</th>
+            <th>Cliente</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="vendas-tbody"></tbody>
+      </table>
+    </div>
+  </div> <!-- fim aba-historico -->
+
+  <!-- ABA ORÇAMENTOS -->
+  <div id="aba-orcamentos" style="display:none;">
+    <div class="cards-row" id="orc-cards"></div>
+    <div id="orc-lista"></div>
+  </div>
+
+  </div> <!-- fim page-vendas -->
+
+  <!-- IMPRESSÕES EM ANDAMENTO -->
+  <div id="page-impressoes" class="page">
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <div>
+        <h2>Impressões</h2>
+        <p>Registre cada impressão — o filamento é descontado automaticamente do estoque</p>
+      </div>
+      <button class="btn btn-primary" onclick="openModal('modal-impressao')">+ Nova Impressão</button>
+    </div>
+
+    <div class="cards-row" id="imp-cards"></div>
+
+    <div class="table-wrap">
+      <div class="table-header">
+        <h3>Histórico de Impressões</h3>
+        <span id="imp-count" style="font-size:0.8rem;color:rgba(255,255,255,0.45);font-family:'JetBrains Mono',monospace;"></span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Descrição</th>
+            <th>Filamento</th>
+            <th>Consumo</th>
+            <th>Custo Mat.</th>
+            <th>Tempo</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="imp-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- GASTOS -->
+  <div id="page-gastos" class="page">
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <div>
+        <h2>Gastos</h2>
+        <p>Controle todos os seus custos — impressora, filamentos, materiais e mais</p>
+      </div>
+      <button class="btn btn-primary" onclick="openModal('modal-gasto')">+ Registrar Gasto</button>
+    </div>
+
+    <!-- Cards resumo -->
+    <div class="cards-row" id="gastos-cards"></div>
+
+    <!-- Filtro período -->
+    <div style="display:flex;gap:10px;margin-bottom:20px;align-items:center;flex-wrap:wrap;">
+      <span style="font-size:0.8rem;color:rgba(255,255,255,0.45);font-weight:600;">PERÍODO:</span>
+      <button class="btn btn-ghost btn-sm gasto-periodo-btn active" onclick="filtrarGastosPeriodo('tudo',this)">Tudo</button>
+      <button class="btn btn-ghost btn-sm gasto-periodo-btn" onclick="filtrarGastosPeriodo('mes',this)">Este Mês</button>
+      <button class="btn btn-ghost btn-sm gasto-periodo-btn" onclick="filtrarGastosPeriodo('ano',this)">Este Ano</button>
+      <span style="font-size:0.8rem;color:rgba(255,255,255,0.45);font-weight:600;margin-left:10px;">CATEGORIA:</span>
+      <select id="gasto-filtro-cat" onchange="renderGastos()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(200,131,10,0.2);color:#ffffff;border-radius:7px;padding:5px 10px;font-family:'Inter',sans-serif;font-size:0.83rem;">
+        <option value="">Todas</option>
+        <option value="impressora">Impressora</option>
+        <option value="filamento">Filamento</option>
+        <option value="manutencao">Manutenção</option>
+        <option value="energia">Energia Elétrica</option>
+        <option value="embalagem">Embalagem</option>
+        <option value="ferramenta">Ferramentas</option>
+        <option value="software">Software / Assinatura</option>
+        <option value="outro">Outro</option>
+      </select>
+    </div>
+
+    <!-- Gráfico por categoria -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;">
+      <div class="table-wrap" style="padding:20px;">
+        <h3 style="font-size:0.95rem;font-weight:700;margin-bottom:16px;">Por Categoria</h3>
+        <div id="gastos-por-categoria"></div>
+      </div>
+      <div class="table-wrap" style="padding:20px;">
+        <h3 style="font-size:0.95rem;font-weight:700;margin-bottom:16px;">Lucro Real (Vendas − Gastos)</h3>
+        <div id="gastos-lucro-real"></div>
+      </div>
+    </div>
+
+    <!-- Tabela -->
+    <div class="table-wrap">
+      <div class="table-header">
+        <h3>Histórico de Gastos</h3>
+        <span id="gastos-count" style="font-size:0.8rem;color:rgba(255,255,255,0.45);font-family:'JetBrains Mono',monospace;"></span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Descrição</th>
+            <th>Categoria</th>
+            <th>Valor</th>
+            <th>Recorrente</th>
+            <th>Notas</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="gastos-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- DRE -->
+  <div id="page-dre" class="page">
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <div>
+        <h2>DRE — Demonstrativo de Resultado</h2>
+        <p>Visão financeira completa do seu negócio por período</p>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <select id="dre-mes" onchange="renderDRE()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(200,131,10,0.2);color:#ffffff;border-radius:7px;padding:8px 12px;font-family:'Inter',sans-serif;font-size:0.88rem;font-weight:600;">
+        </select>
+        <select id="dre-ano" onchange="renderDRE()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(200,131,10,0.2);color:#ffffff;border-radius:7px;padding:8px 12px;font-family:'Inter',sans-serif;font-size:0.88rem;font-weight:600;">
+        </select>
+        <button class="btn btn-ghost" onclick="dreAnoCompleto()">Ver Ano Completo</button>
+      </div>
+    </div>
+
+    <!-- Cards topo -->
+    <div class="cards-row" id="dre-cards"></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+
+      <!-- DRE Tabela -->
+      <div class="table-wrap" style="padding:0;overflow:hidden;">
+        <div class="table-header">
+          <h3 id="dre-titulo">DRE — Mensal</h3>
+        </div>
+        <div id="dre-tabela" style="padding:0 20px 20px;"></div>
+      </div>
+
+      <!-- Evolução mensal -->
+      <div class="table-wrap" style="padding:20px;">
+        <h3 style="font-size:0.95rem;font-weight:700;margin-bottom:16px;">Evolução nos Últimos 6 Meses</h3>
+        <div id="dre-evolucao"></div>
+      </div>
+
+    </div>
+
+    <!-- Comparativo meses -->
+    <div class="table-wrap" style="margin-top:20px;overflow:hidden;">
+      <div class="table-header">
+        <h3>Comparativo Mensal — Ano Atual</h3>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Mês</th>
+            <th>Receita Bruta</th>
+            <th>Custo Produção</th>
+            <th>Lucro Bruto</th>
+            <th>Gastos Op.</th>
+            <th>Lucro Real</th>
+            <th>Margem</th>
+            <th>Vendas</th>
+          </tr>
+        </thead>
+        <tbody id="dre-comparativo"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ANÁLISE MENSAL -->
+  <div id="page-analise" class="page">
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <div>
+        <h2>Análise Mensal</h2>
+        <p>Acompanhe cada indicador do seu negócio mês a mês</p>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <select id="an-ano" onchange="renderAnalise()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(200,131,10,0.2);color:#ffffff;border-radius:7px;padding:8px 14px;font-family:'Inter',sans-serif;font-size:0.88rem;font-weight:600;"></select>
+      </div>
+    </div>
+
+    <!-- Indicador selecionado -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;" id="an-indicadores">
+      <button class="an-btn active" onclick="selecionarIndicador('receita',this)">💰 Receita</button>
+      <button class="an-btn" onclick="selecionarIndicador('lucro_bruto',this)">📈 Lucro Bruto</button>
+      <button class="an-btn" onclick="selecionarIndicador('lucro_real',this)">🏆 Lucro Real</button>
+      <button class="an-btn" onclick="selecionarIndicador('gastos',this)">💸 Gastos</button>
+      <button class="an-btn" onclick="selecionarIndicador('vendas_qtd',this)">🛒 Qtd. Vendas</button>
+      <button class="an-btn" onclick="selecionarIndicador('ticket_medio',this)">🎯 Ticket Médio</button>
+      <button class="an-btn" onclick="selecionarIndicador('margem',this)">📊 Margem %</button>
+      <button class="an-btn" onclick="selecionarIndicador('filamento',this)">🧵 Filamento Usado</button>
+    </div>
+
+    <!-- Gráfico principal de barras -->
+    <div class="table-wrap" style="padding:24px;margin-bottom:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <h3 id="an-grafico-titulo" style="font-size:0.95rem;font-weight:700;">Receita por Mês</h3>
+        <div style="display:flex;gap:6px;font-size:0.75rem;color:rgba(255,255,255,0.45);">
+          <span id="an-total-label"></span>
+        </div>
+      </div>
+      <div id="an-grafico" style="display:flex;align-items:flex-end;gap:8px;height:180px;"></div>
+      <div id="an-meses-labels" style="display:flex;gap:8px;margin-top:6px;"></div>
+    </div>
+
+    <!-- Cards dos 12 meses -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:24px;" id="an-meses-cards"></div>
+
+    <!-- Tabela completa -->
+    <div class="table-wrap">
+      <div class="table-header">
+        <h3>Resumo Completo — Todos os Meses</h3>
+      </div>
+      <div style="overflow-x:auto;">
+        <table style="min-width:900px;">
+          <thead>
+            <tr>
+              <th>Mês</th>
+              <th>Receita</th>
+              <th>Custo Prod.</th>
+              <th>Lucro Bruto</th>
+              <th>Gastos Op.</th>
+              <th>Lucro Real</th>
+              <th>Margem</th>
+              <th>Vendas</th>
+              <th>Ticket Médio</th>
+              <th>Filamento</th>
+            </tr>
+          </thead>
+          <tbody id="an-tabela"></tbody>
+          <tfoot id="an-totais" style="font-weight:800;background:rgba(200,131,10,0.12);"></tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALCULADORA -->
+  <div id="page-calcular" class="page">
+    <div class="page-header">
+      <h2>Calculadora de Preço</h2>
+      <p>Cálculo completo e detalhado — saiba exatamente quanto cobrar do cliente</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;">
+
+      <!-- COLUNA ESQUERDA: ENTRADAS -->
+      <div style="display:flex;flex-direction:column;gap:16px;">
+
+        <!-- BLOCO 1: FILAMENTO -->
+        <div class="table-wrap" style="padding:20px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+            <span style="font-size:1.1rem;">🧵</span>
+            <h3 style="font-size:0.95rem;font-weight:800;">Material</h3>
+          </div>
+          <div class="form-group">
+            <label>Filamento utilizado</label>
+            <select id="calc-filamento" onchange="calcular()">
+              <option value="">Selecione um filamento</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Peso consumido (g)</label>
+              <input type="number" id="calc-peso" value="50" min="0" step="0.1" oninput="calcular()">
+            </div>
+            <div class="form-group">
+              <label>Falhas / Desperdício (%)</label>
+              <input type="number" id="calc-falha" value="5" min="0" max="100" step="1" oninput="calcular()" title="% extra de filamento para cobrir possíveis falhas e reimpressões">
+            </div>
+          </div>
+          <div id="calc-fil-detalhe" style="display:none;background:rgba(255,255,255,0.06);border-radius:8px;padding:10px 12px;font-size:0.8rem;color:rgba(255,255,255,0.45);margin-top:-4px;">
+            <span id="calc-fil-detalhe-txt"></span>
+          </div>
+        </div>
+
+        <!-- BLOCO 2: ENERGIA -->
+        <div class="table-wrap" style="padding:20px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+            <span style="font-size:1.1rem;">⚡</span>
+            <h3 style="font-size:0.95rem;font-weight:800;">Energia Elétrica</h3>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Tempo de impressão — Horas</label>
+              <input type="number" id="calc-tempo-h" value="3" min="0" step="1" oninput="calcular()">
+            </div>
+            <div class="form-group">
+              <label>Tempo de impressão — Minutos</label>
+              <input type="number" id="calc-tempo-m" value="0" min="0" max="59" step="1" oninput="calcular()">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Potência da impressora (W)</label>
+              <input type="number" id="calc-watts" value="120" min="0" step="10" oninput="calcular()" title="Potência média da impressora em Watts. Ender 3 ≈ 120W, Bambu ≈ 350W">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Tarifa de energia (R$/kWh)</label>
+            <input type="number" id="calc-tarifa" value="0.75" min="0" step="0.01" oninput="calcular()" title="Veja na sua conta de luz. Média Brasil: R$ 0,75/kWh">
+          </div>
+        </div>
+
+        <!-- BLOCO 3: MÃO DE OBRA -->
+        <div class="table-wrap" style="padding:20px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+            <span style="font-size:1.1rem;">🙌</span>
+            <h3 style="font-size:0.95rem;font-weight:800;">Mão de Obra & Tempo</h3>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Valor hora do seu trabalho (R$)</label>
+              <input type="number" id="calc-hora-valor" value="20" min="0" step="1" oninput="calcular()" title="Quanto vale 1 hora do seu tempo?">
+            </div>
+            <div class="form-group">
+              <label>Tempo de preparo/pós (min)</label>
+              <input type="number" id="calc-preparo" value="20" min="0" step="5" oninput="calcular()" title="Tempo gasto configurando, removendo, limpando e acabando a peça">
+            </div>
+          </div>
+        </div>
+
+        <!-- BLOCO 4: CUSTOS FIXOS E EXTRAS -->
+        <div class="table-wrap" style="padding:20px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+            <span style="font-size:1.1rem;">🔧</span>
+            <h3 style="font-size:0.95rem;font-weight:800;">Custos Fixos & Extras</h3>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Desgaste da impressora (R$)</label>
+              <input type="number" id="calc-desgaste" value="2.00" min="0" step="0.50" oninput="calcular()" title="Custo estimado de manutenção, bicos, correias, etc. por impressão">
+            </div>
+            <div class="form-group">
+              <label>Embalagem / Frete (R$)</label>
+              <input type="number" id="calc-embalagem" value="0" min="0" step="0.50" oninput="calcular()">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Outros custos adicionais (R$)</label>
+            <input type="number" id="calc-outros" value="0" min="0" step="1" oninput="calcular()">
+          </div>
+        </div>
+
+        <!-- BLOCO 5: PRECIFICAÇÃO -->
+        <div class="table-wrap" style="padding:20px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+            <span style="font-size:1.1rem;">💰</span>
+            <h3 style="font-size:0.95rem;font-weight:800;">Precificação</h3>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Margem de lucro (%)</label>
+              <input type="number" id="calc-margem" value="40" min="0" step="5" oninput="calcular()">
+            </div>
+            <div class="form-group">
+              <label>Imposto / Taxa plataforma (%)</label>
+              <input type="number" id="calc-imposto" value="0" min="0" step="1" oninput="calcular()" title="Se vende por marketplace (Mercado Livre, etc.), inclua a taxa aqui">
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- COLUNA DIREITA: RESULTADO -->
+      <div style="display:flex;flex-direction:column;gap:16px;position:sticky;top:24px;">
+
+        <!-- RESULTADO PRINCIPAL -->
+        <div style="background:linear-gradient(135deg,rgba(255,107,53,0.15),rgba(200,131,10,0.1));border:1px solid rgba(200,131,10,0.4);border-radius:14px;padding:24px;text-align:center;">
+          <div style="font-size:0.72rem;font-family:'JetBrains Mono',monospace;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Preço Sugerido ao Cliente</div>
+          <div id="p-final" style="font-size:3rem;font-weight:800;color:#C8830A;letter-spacing:-2px;">R$ 0,00</div>
+          <div style="font-size:0.8rem;color:rgba(255,255,255,0.45);margin-top:6px;">Custo: <span id="p-custo-inline" style="color:#ffffff">R$ 0,00</span> · Lucro: <span id="p-lucro-inline" style="color:#C8830A">R$ 0,00</span></div>
+        </div>
+
+        <!-- BREAKDOWN DETALHADO -->
+        <div class="calc-box">
+          <h4>📊 Detalhamento dos Custos</h4>
+
+          <div style="font-size:0.7rem;color:#C8830A;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:0.8px;margin:10px 0 6px;">Material</div>
+          <div class="calc-row"><span>Filamento (peso × R$/g)</span><span id="c-filamento">—</span></div>
+          <div class="calc-row"><span>Reserva de falhas/desperdício</span><span id="c-falha">—</span></div>
+
+          <div style="font-size:0.7rem;color:#C8830A;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:0.8px;margin:10px 0 6px;">Energia</div>
+          <div class="calc-row"><span>Consumo elétrico</span><span id="c-energia">—</span></div>
+          <div class="calc-row" style="font-size:0.78rem;color:rgba(255,255,255,0.45);padding:2px 0;border:none;"><span id="c-energia-detalhe">—</span></div>
+
+          <div style="font-size:0.7rem;color:#C8830A;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:0.8px;margin:10px 0 6px;">Mão de Obra</div>
+          <div class="calc-row"><span>Tempo de preparo/pós</span><span id="c-preparo">—</span></div>
+
+          <div style="font-size:0.7rem;color:#C8830A;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:0.8px;margin:10px 0 6px;">Fixos & Extras</div>
+          <div class="calc-row"><span>Desgaste da impressora</span><span id="c-desgaste">—</span></div>
+          <div class="calc-row"><span>Embalagem / Frete</span><span id="c-embalagem">—</span></div>
+          <div class="calc-row"><span>Outros</span><span id="c-outros">—</span></div>
+
+          <div style="height:1px;background:rgba(200,131,10,0.2);margin:10px 0;"></div>
+          <div class="calc-row total"><span>Custo Total</span><span id="c-total">R$ 0,00</span></div>
+        </div>
+
+        <!-- PRECIFICAÇÃO -->
+        <div class="calc-box">
+          <h4>💡 Formação do Preço</h4>
+          <div class="calc-row"><span>Custo total</span><span id="p-custo">R$ 0,00</span></div>
+          <div class="calc-row"><span>Lucro (<span id="lbl-margem">40</span>%)</span><span id="p-margem" style="color:#C8830A">R$ 0,00</span></div>
+          <div class="calc-row"><span>Imposto/Taxa</span><span id="p-imposto">R$ 0,00</span></div>
+          <div class="calc-row total"><span>Preço final</span><span id="p-final2" style="color:#C8830A">R$ 0,00</span></div>
+        </div>
+
+        <!-- INDICADORES -->
+        <div class="calc-box">
+          <h4>📈 Indicadores</h4>
+          <div class="calc-row"><span>Custo real por grama</span><span id="r-gramas" style="color:#e6a020">—</span></div>
+          <div class="calc-row"><span>Custo por hora de impressão</span><span id="r-hora-custo">—</span></div>
+          <div class="calc-row"><span>Lucro por hora</span><span id="r-hora" style="color:#C8830A">—</span></div>
+          <div class="calc-row"><span>Margem real sobre venda</span><span id="r-margem-real">—</span></div>
+        </div>
+
+        <button class="btn btn-success" style="width:100%;padding:14px;font-size:1rem;" onclick="salvarComoVenda()">💾 Salvar como Venda</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- MODALS -->
+
+<!-- Modal Impressão -->
+<div class="modal-bg" id="modal-impressao">
+  <div class="modal">
+    <h3>Registrar Impressão</h3>
+    <div class="info-box" style="background:rgba(200,131,10,0.1);border:1px solid rgba(124,106,247,0.3);border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:0.82rem;color:#a99ff5;">
+      ⚙️ O consumo de filamento será <strong>descontado automaticamente</strong> do estoque ao salvar.
+    </div>
+    <div class="form-group">
+      <label>Descrição / Nome da peça</label>
+      <input type="text" id="imp-nome" placeholder="Ex: Vaso decorativo 20cm">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Filamento utilizado</label>
+        <select id="imp-filamento" onchange="atualizarInfoFilamento()">
+          <option value="">Selecione...</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Peça do catálogo (opcional)</label>
+        <select id="imp-peca" onchange="preencherImpressaoPeca()">
+          <option value="">Nenhuma</option>
+        </select>
+      </div>
+    </div>
+    <div id="imp-fil-info" style="display:none;background:rgba(255,255,255,0.06);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:0.82rem;">
+      <span id="imp-fil-info-txt"></span>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Consumo de filamento (g)</label>
+        <input type="number" id="imp-consumo" placeholder="50" min="0" step="0.1" oninput="calcImpressao()">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Tempo de impressão — Horas</label>
+        <input type="number" id="imp-tempo-h" placeholder="0" min="0" step="1" oninput="calcImpressao()">
+      </div>
+      <div class="form-group">
+        <label>Tempo de impressão — Minutos</label>
+        <input type="number" id="imp-tempo-m" placeholder="0" min="0" max="59" step="1" oninput="calcImpressao()">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Data</label>
+        <input type="date" id="imp-data">
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="imp-status">
+          <option value="concluida">Concluída</option>
+          <option value="andamento">Em andamento</option>
+          <option value="falhou">Falhou / Descartada</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Observações</label>
+      <textarea id="imp-obs" placeholder="Configurações usadas, qualidade, notas..."></textarea>
+    </div>
+    <div id="imp-preview" class="calc-box" style="margin-top:4px;">
+      <h4>Resumo</h4>
+      <div class="calc-row"><span>Filamento selecionado</span><span id="ip-fil">—</span></div>
+      <div class="calc-row"><span>Consumo</span><span id="ip-consumo">—</span></div>
+      <div class="calc-row"><span>Estoque atual</span><span id="ip-estoque-atual">—</span></div>
+      <div class="calc-row total"><span>Estoque após impressão</span><span id="ip-estoque-apos">—</span></div>
+      <div class="calc-row"><span>Custo do material</span><span id="ip-custo">—</span></div>
+    </div>
+    <div id="imp-alerta" style="display:none;background:rgba(255,77,109,0.12);border:1px solid rgba(255,77,109,0.4);border-radius:8px;padding:10px 14px;margin-top:12px;font-size:0.82rem;color:#ff4d6d;">
+      ⚠️ <span id="imp-alerta-txt"></span>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-impressao')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarImpressao()">Confirmar Impressão</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Filamento -->
+
+<div class="modal-bg" id="modal-filamento">
+  <div class="modal">
+    <h3 id="modal-fil-title">Novo Filamento</h3>
+    <input type="hidden" id="fil-edit-id">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Nome / Marca</label>
+        <input type="text" id="fil-nome" placeholder="Ex: Polymaker PLA">
+      </div>
+      <div class="form-group">
+        <label>Tipo</label>
+        <select id="fil-tipo">
+          <option>PLA</option>
+          <option>ABS</option>
+          <option>PETG</option>
+          <option>TPU</option>
+          <option>ASA</option>
+          <option>Nylon</option>
+          <option>Resina</option>
+          <option>Outro</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Cor</label>
+        <input type="text" id="fil-cor" placeholder="Ex: Vermelho">
+      </div>
+      <div class="form-group">
+        <label>Cor (hex)</label>
+        <input type="color" id="fil-cor-hex" value="#C8830A" style="height:40px;cursor:pointer;">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Estoque atual (kg)</label>
+        <input type="number" id="fil-estoque" placeholder="1" min="0" step="0.1">
+      </div>
+      <div class="form-group">
+        <label>Custo por kg (R$)</label>
+        <input type="number" id="fil-custo" placeholder="80.00" min="0" step="0.01">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Estoque mínimo alerta (kg)</label>
+      <input type="number" id="fil-minimo" placeholder="0.2" min="0" step="0.1">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-filamento')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarFilamento()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Peça -->
+<div class="modal-bg" id="modal-peca">
+  <div class="modal">
+    <h3 id="modal-peca-title">Nova Peça</h3>
+    <input type="hidden" id="peca-edit-id">
+    <div class="form-group">
+      <label>Nome da Peça</label>
+      <input type="text" id="peca-nome" placeholder="Ex: Suporte de Parede">
+    </div>
+    <div class="form-group">
+      <label>Descrição</label>
+      <textarea id="peca-desc" placeholder="Descrição da peça, uso, características..."></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Emoji / Ícone</label>
+        <input type="text" id="peca-emoji" placeholder="🖨️" maxlength="2">
+      </div>
+      <div class="form-group">
+        <label>Categoria</label>
+        <select id="peca-categoria">
+          <option>Decoração</option>
+          <option>Funcional</option>
+          <option>Suporte</option>
+          <option>Brinquedo</option>
+          <option>Industrial</option>
+          <option>Personalizado</option>
+          <option>Outro</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Peso médio (g)</label>
+        <input type="number" id="peca-peso" placeholder="50" min="0" step="0.1">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Tempo médio — Horas</label>
+        <input type="number" id="peca-tempo-h" placeholder="0" min="0" step="1">
+      </div>
+      <div class="form-group">
+        <label>Tempo médio — Minutos</label>
+        <input type="number" id="peca-tempo-m" placeholder="0" min="0" max="59" step="1">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Preço de custo (R$)</label>
+        <input type="number" id="peca-custo" placeholder="15.00" min="0" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>Preço de venda (R$)</label>
+        <input type="number" id="peca-venda" placeholder="35.00" min="0" step="0.01">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Filamento principal</label>
+      <select id="peca-filamento">
+        <option value="">Nenhum especificado</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-peca')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarPeca()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Venda -->
+<div class="modal-bg" id="modal-venda">
+  <div class="modal">
+    <h3>Registrar Venda</h3>
+    <div class="form-group">
+      <label>Peça vendida / Produto</label>
+      <select id="venda-peca" onchange="preencherVendaPeca()">
+        <option value="">Produto personalizado</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Descrição / Nome (se personalizado)</label>
+      <input type="text" id="venda-nome" placeholder="Ex: Suporte personalizado">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Quantidade</label>
+        <input type="number" id="venda-qtd" value="1" min="1" oninput="calcVenda()">
+      </div>
+      <div class="form-group">
+        <label>Preço de custo unitário (R$)</label>
+        <input type="number" id="venda-custo" placeholder="0.00" step="0.01" oninput="calcVenda()">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Preço de venda unitário (R$)</label>
+        <input type="number" id="venda-valor" placeholder="0.00" step="0.01" oninput="calcVenda()">
+      </div>
+      <div class="form-group">
+        <label>Data</label>
+        <input type="date" id="venda-data">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Cliente (opcional)</label>
+      <input type="text" id="venda-cliente" placeholder="Nome do cliente">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Forma de Pagamento</label>
+        <select id="venda-pagamento">
+          <option value="pix">Pix</option>
+          <option value="dinheiro">Dinheiro</option>
+          <option value="cartao_credito">Cartão de Crédito</option>
+          <option value="cartao_debito">Cartão de Débito</option>
+          <option value="transferencia">Transferência</option>
+          <option value="outro">Outro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Status da Venda</label>
+        <select id="venda-status">
+          <option value="entregue">Entregue ✅</option>
+          <option value="pendente">Pendente ⏳</option>
+          <option value="cancelada">Cancelada ❌</option>
+        </select>
+      </div>
+    </div>
+    <div id="venda-preview" class="calc-box" style="display:none;margin-top:16px;">
+      <div class="calc-row"><span>Custo total</span><span id="vp-custo">—</span></div>
+      <div class="calc-row"><span>Receita</span><span id="vp-receita">—</span></div>
+      <div class="calc-row total"><span>Lucro</span><span id="vp-lucro">—</span></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-venda')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarVenda()">Registrar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============== STATE ==============
+const APP_VERSION = '2.0';
+
+let state = {
+  filamentos: [],
+  pecas: [],
+  vendas: [],
+  impressoes: [],
+  gastos: [],
+  orcamentos: [],
+  historicoReab: []
+};
+
+function garantirArrays() {
+  if (!state.impressoes)    state.impressoes    = [];
+  if (!state.gastos)        state.gastos        = [];
+  if (!state.orcamentos)    state.orcamentos    = [];
+  if (!state.historicoReab) state.historicoReab = [];
+  if (!state.pecas)         state.pecas         = [];
+  if (!state.filamentos)    state.filamentos    = [];
+  if (!state.vendas)        state.vendas        = [];
+}
+
+function loadState() {
+  const savedVersion = localStorage.getItem('print3d_version');
+  if (savedVersion !== APP_VERSION) {
+    const saved = localStorage.getItem('print3d_state');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      const isDemoData = parsed.filamentos && parsed.filamentos.some(f => f.id === 1 || f.id === 2 || f.id === 3);
+      if (isDemoData) {
+        localStorage.removeItem('print3d_state');
+        localStorage.setItem('print3d_version', APP_VERSION);
+        garantirArrays();
+        return;
+      }
+    }
+    localStorage.setItem('print3d_version', APP_VERSION);
+  }
+  const saved = localStorage.getItem('print3d_state');
+  if (saved) state = JSON.parse(saved);
+  garantirArrays();
+}
+
+function saveState() {
+  localStorage.setItem('print3d_state', JSON.stringify(state));
+  atualizarStatusSalvo();
+}
+
+function atualizarStatusSalvo(msg) {
+  const el = document.getElementById('save-status');
+  if (!el) return;
+  if (msg) {
+    el.textContent = msg;
+    el.style.color = '#C8830A';
+    setTimeout(() => { el.style.color = 'rgba(255,255,255,0.45)'; }, 3000);
+    return;
+  }
+  const agora = new Date();
+  const hora = agora.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+  el.textContent = '☁️ Salvo às ' + hora;
+  el.style.color = '#C8830A';
+  setTimeout(() => { el.style.color = 'rgba(255,255,255,0.45)'; }, 3000);
+}
+
+function salvarManual() {
+  saveState();
+  const btn = document.getElementById('btn-salvar');
+  const original = btn.innerHTML;
+  btn.innerHTML = '✅ Salvo!';
+  setTimeout(() => { btn.innerHTML = original; }, 2000);
+}
+
+function genId() { return Date.now(); }
+function fmt(v) { return 'R$ ' + Number(v).toFixed(2).replace('.', ','); }
+function fmtKg(v) { return Number(v) % 1 === 0 ? Number(v) + ' kg' : Number(v).toFixed(1).replace('.', ',') + ' kg'; }
+function tempoEmHoras(h, m) { return (Number(h) || 0) + (Number(m) || 0) / 60; }
+function exibirTempo(horasDecimal) {
+  const h = Math.floor(horasDecimal);
+  const m = Math.round((horasDecimal - h) * 60);
+  if (h === 0) return m + 'min';
+  if (m === 0) return h + 'h';
+  return h + 'h ' + m + 'min';
+}
+
+// ============== NAV ==============
+function navigate(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.textContent.toLowerCase().includes(page === 'dashboard' ? 'dashboard' :
+        page === 'filamentos' ? 'filament' :
+        page === 'pecas' ? 'catálog' :
+        page === 'impressoes' ? 'impressõ' :
+        page === 'gastos' ? 'gasto' :
+        page === 'dre' ? 'dre' :
+        page === 'analise' ? 'análise' :
+        page === 'vendas' ? 'venda' : 'calculad')) n.classList.add('active');
+  });
+  if (page === 'dashboard') renderDashboard();
+  if (page === 'filamentos') renderFilamentos();
+  if (page === 'pecas') renderPecas();
+  if (page === 'impressoes') renderImpressoes();
+  if (page === 'gastos') renderGastos();
+  if (page === 'dre') { inicializarDRE(); renderDRE(); }
+  if (page === 'analise') { inicializarAnalise(); renderAnalise(); }
+  if (page === 'vendas') renderVendas();
+  if (page === 'calcular') renderCalc();
+}
+
+// ============== MODAL ==============
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  if (id === 'modal-peca' || id === 'modal-venda') populateFilamentosSelect();
+  if (id === 'modal-orcamento') {
+    abrirModalOrcamento();
+    document.getElementById('modal-orc-title').textContent = '📄 Novo Orçamento';
+    document.getElementById('orc-edit-idx').value = '';
+  }
+  if (id === 'modal-gasto') {
+    document.getElementById('modal-gasto-title').textContent = 'Registrar Gasto';
+    document.getElementById('gasto-edit-idx').value = '';
+    document.getElementById('gasto-data').value = new Date().toISOString().split('T')[0];
+  }
+  if (id === 'modal-reabastecer') {
+    populateReabSelect();
+    document.getElementById('reab-atual').style.display = 'none';
+    document.getElementById('reab-preview').style.display = 'none';
+    document.getElementById('reab-historico-wrap').style.display = 'none';
+    document.getElementById('reab-qtd').value = '';
+    document.getElementById('reab-custo').value = '';
+    document.getElementById('reab-fornecedor').value = '';
+    document.getElementById('reab-data').value = new Date().toISOString().split('T')[0];
+  }
+  if (id === 'modal-impressao') {
+    populateFilamentosSelectImp();
+    populatePecasSelectImp();
+    document.getElementById('imp-data').value = new Date().toISOString().split('T')[0];
+    delete document.getElementById('modal-impressao').dataset.editIdx;
+    document.querySelector('#modal-impressao h3').textContent = 'Registrar Impressão';
+    calcImpressao();
+  }
+  if (id === 'modal-venda') {
+    populatePecasSelect();
+    document.getElementById('venda-data').value = new Date().toISOString().split('T')[0];
+  }
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  clearForms(id);
+}
+
+function clearForms(id) {
+  document.querySelectorAll(`#${id} input, #${id} select, #${id} textarea`).forEach(el => {
+    if (el.type === 'color') el.value = '#C8830A';
+    else if (el.type === 'hidden') el.value = '';
+    else if (el.tagName === 'SELECT') el.selectedIndex = 0;
+    else el.value = '';
+  });
+  document.getElementById('venda-preview') && (document.getElementById('venda-preview').style.display = 'none');
+}
+
+// ============== FILAMENTOS ==============
+function renderFilamentos() {
+  const tbody = document.getElementById('fil-tbody');
+  const count = document.getElementById('fil-count');
+  count.textContent = state.filamentos.length + ' itens';
+
+  if (!state.filamentos.length) {
+    tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="es-icon">🧵</div><p>Nenhum filamento cadastrado</p></div></td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = state.filamentos.map((f, idx) => {
+    const pct = Math.min(100, (f.estoque / 1) * 100); // 1kg = 100%
+    const status = f.estoque <= f.minimo ? 'badge-red' : f.estoque < f.minimo * 2 ? 'badge-orange' : 'badge-green';
+    const statusTxt = f.estoque <= f.minimo ? 'Crítico' : f.estoque < f.minimo * 2 ? 'Baixo' : 'OK';
+    const cpg = (f.custo / 1000).toFixed(4).replace('.', ',');
+    return `<tr>
+      <td><strong>${f.nome}</strong></td>
+      <td><span class="badge badge-purple">${f.tipo}</span></td>
+      <td><span class="color-dot" style="background:${f.corHex}"></span>${f.cor}</td>
+      <td>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:0.85rem">${fmtKg(f.estoque)}</span>
+        <div class="filament-bar"><div class="filament-bar-fill" style="width:${pct}%;background:${f.corHex}"></div></div>
+      </td>
+      <td style="font-family:'JetBrains Mono',monospace">${fmt(f.custo)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;color:rgba(255,255,255,0.45)">R$ ${cpg}/g</td>
+      <td><span class="badge ${status}">${statusTxt}</span></td>
+      <td>
+        <div class="btn-row">
+          <button class="btn btn-ghost btn-sm" onclick="editFilamento(${idx})">✏️ Editar</button>
+          <button class="btn btn-danger btn-sm" onclick="delFilamento(${idx})">🗑️ Excluir</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function salvarFilamento() {
+  const idxStr = document.getElementById('fil-edit-id').value;
+  const obj = {
+    id: genId(),
+    nome: document.getElementById('fil-nome').value || 'Filamento',
+    tipo: document.getElementById('fil-tipo').value,
+    cor: document.getElementById('fil-cor').value || 'N/A',
+    corHex: document.getElementById('fil-cor-hex').value,
+    estoque: Number(document.getElementById('fil-estoque').value) || 0,
+    custo: Number(document.getElementById('fil-custo').value) || 0,
+    minimo: Number(document.getElementById('fil-minimo').value) || 200,
+  };
+  if (idxStr !== '') {
+    const idx = Number(idxStr);
+    obj.id = state.filamentos[idx].id; // preserva o id original
+    state.filamentos[idx] = obj;
+  } else {
+    state.filamentos.push(obj);
+  }
+  saveState();
+  closeModal('modal-filamento');
+  renderFilamentos();
+}
+
+function editFilamento(idx) {
+  const f = state.filamentos[idx];
+  if (!f) return;
+  document.getElementById('modal-fil-title').textContent = 'Editar Filamento';
+  document.getElementById('fil-edit-id').value = idx;
+  document.getElementById('fil-nome').value = f.nome;
+  document.getElementById('fil-tipo').value = f.tipo;
+  document.getElementById('fil-cor').value = f.cor;
+  document.getElementById('fil-cor-hex').value = f.corHex;
+  document.getElementById('fil-estoque').value = f.estoque;
+  document.getElementById('fil-custo').value = f.custo;
+  document.getElementById('fil-minimo').value = f.minimo;
+  openModal('modal-filamento');
+}
+
+function populateFilamentosSelect() {
+  ['calc-filamento', 'peca-filamento'].forEach(sel => {
+    const el = document.getElementById(sel);
+    if (!el) return;
+    const cur = el.value;
+    el.innerHTML = '<option value="">Selecione...</option>' +
+      state.filamentos.map(f => `<option value="${f.id}" ${cur == f.id ? 'selected' : ''}>${f.nome} (${f.tipo})</option>`).join('');
+  });
+}
+
+// ============== PECAS ==============
+function renderPecas() {
+  const grid = document.getElementById('pecas-grid');
+  if (!state.pecas.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="es-icon">🖨️</div><p>Nenhuma peça cadastrada ainda</p><button class="btn btn-primary" onclick="openModal(\'modal-peca\')">+ Adicionar Peça</button></div>';
+    return;
+  }
+  grid.innerHTML = state.pecas.map((p, idx) => {
+    const fil = state.filamentos.find(f => f.id === p.filamento);
+    const lucro = p.venda - p.custo;
+    const margem = p.custo > 0 ? ((lucro / p.custo) * 100).toFixed(0) : 0;
+    return `<div class="peca-card">
+      <div class="peca-thumb">${p.emoji || '🖨️'}</div>
+      <div class="peca-info">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span class="peca-name">${p.nome}</span>
+          <span class="badge badge-purple">${p.categoria}</span>
+        </div>
+        <div class="peca-meta">${p.peso}g · ${exibirTempo(p.tempo)}${fil ? ' · ' + fil.nome : ''}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+          <div>
+            <div style="font-size:0.72rem;color:rgba(255,255,255,0.45)">Custo</div>
+            <div style="font-size:0.85rem;font-weight:700;font-family:'JetBrains Mono',monospace">${fmt(p.custo)}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:0.72rem;color:rgba(255,255,255,0.45)">Venda</div>
+            <div class="peca-price">${fmt(p.venda)}</div>
+          </div>
+        </div>
+        <div style="font-size:0.75rem;color:#C8830A;margin-top:4px">Margem: ${margem}%</div>
+        <div class="peca-actions">
+          <button class="btn btn-ghost btn-sm" style="flex:1" onclick="editPeca(${idx})">✏️ Editar</button>
+          <button class="btn btn-danger btn-sm" onclick="delPeca(${idx})">🗑️</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function salvarPeca() {
+  const idxStr = document.getElementById('peca-edit-id').value;
+  const obj = {
+    id: genId(),
+    nome: document.getElementById('peca-nome').value || 'Peça',
+    desc: document.getElementById('peca-desc').value,
+    emoji: document.getElementById('peca-emoji').value || '🖨️',
+    categoria: document.getElementById('peca-categoria').value,
+    peso: Number(document.getElementById('peca-peso').value) || 0,
+    tempo: tempoEmHoras(document.getElementById('peca-tempo-h').value, document.getElementById('peca-tempo-m').value),
+    custo: Number(document.getElementById('peca-custo').value) || 0,
+    venda: Number(document.getElementById('peca-venda').value) || 0,
+    filamento: Number(document.getElementById('peca-filamento').value) || null,
+  };
+  if (idxStr !== '') {
+    const idx = Number(idxStr);
+    obj.id = state.pecas[idx].id;
+    state.pecas[idx] = obj;
+  } else {
+    state.pecas.push(obj);
+  }
+  saveState();
+  closeModal('modal-peca');
+  renderPecas();
+}
+
+function editPeca(idx) {
+  const p = state.pecas[idx];
+  if (!p) return;
+  document.getElementById('modal-peca-title').textContent = 'Editar Peça';
+  document.getElementById('peca-edit-id').value = idx;
+  document.getElementById('peca-nome').value = p.nome;
+  document.getElementById('peca-desc').value = p.desc || '';
+  document.getElementById('peca-emoji').value = p.emoji || '';
+  document.getElementById('peca-categoria').value = p.categoria;
+  document.getElementById('peca-peso').value = p.peso;
+  document.getElementById('peca-tempo-h').value = Math.floor(p.tempo || 0);
+  document.getElementById('peca-tempo-m').value = Math.round(((p.tempo || 0) - Math.floor(p.tempo || 0)) * 60);
+  document.getElementById('peca-custo').value = p.custo;
+  document.getElementById('peca-venda').value = p.venda;
+  populateFilamentosSelect();
+  document.getElementById('peca-filamento').value = p.filamento || '';
+  openModal('modal-peca');
+}
+
+function populatePecasSelect() {
+  const el = document.getElementById('venda-peca');
+  el.innerHTML = '<option value="">Produto personalizado</option>' +
+    state.pecas.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
+}
+
+function preencherVendaPeca() {
+  const id = document.getElementById('venda-peca').value;
+  if (!id) return;
+  const p = state.pecas.find(x => x.id === Number(id));
+  if (p) {
+    document.getElementById('venda-nome').value = p.nome;
+    document.getElementById('venda-custo').value = p.custo;
+    document.getElementById('venda-valor').value = p.venda;
+    calcVenda();
+  }
+}
+
+// ============== VENDAS ==============
+function renderVendas() {
+  const tbody = document.getElementById('vendas-tbody');
+  const cards = document.getElementById('vendas-cards');
+  const vf = vendasFiltradas();
+
+  const total = vf.reduce((s, v) => s + v.valor * v.qtd, 0);
+  const custoTotal = vf.reduce((s, v) => s + v.custo * v.qtd, 0);
+  const lucro = total - custoTotal;
+  const qtd = vf.reduce((s, v) => s + v.qtd, 0);
+  const pendentes = vf.filter(v => v.status === 'pendente').length;
+
+  const labelPeriodo = { tudo:'Total Geral', hoje:'Hoje', semana:'Esta Semana', mes:'Este Mês', ano:'Este Ano' };
+
+  cards.innerHTML = `
+    <div class="card green"><div class="card-label">Receita — ${labelPeriodo[_periodoAtivo]}</div><div class="card-value">${fmt(total)}</div><div class="card-sub">${vf.length} vendas</div></div>
+    <div class="card orange"><div class="card-label">Custo Total</div><div class="card-value">${fmt(custoTotal)}</div><div class="card-sub">Material + produção</div></div>
+    <div class="card purple"><div class="card-label">Lucro Líquido</div><div class="card-value ${lucro >= 0 ? 'profit-positive' : 'profit-negative'}">${fmt(lucro)}</div><div class="card-sub">Margem: ${total > 0 ? ((lucro/total)*100).toFixed(1) : 0}%</div></div>
+    <div class="card ${pendentes > 0 ? 'orange' : 'green'}"><div class="card-label">Peças Vendidas</div><div class="card-value">${qtd}</div><div class="card-sub">${pendentes > 0 ? pendentes + ' entrega(s) pendente' : 'Tudo entregue ✅'}</div></div>
+  `;
+
+  if (!vf.length) {
+    tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state"><div class="es-icon">💰</div><p>Nenhuma venda neste período</p></div></td></tr>`;
+    return;
+  }
+
+  const pagMap = { pix:'Pix', dinheiro:'Dinheiro', cartao_credito:'Crédito', cartao_debito:'Débito', transferencia:'Transf.', outro:'Outro' };
+  const statusBadge = {
+    entregue: '<span class="badge badge-green">Entregue</span>',
+    pendente:  '<span class="badge badge-orange">Pendente</span>',
+    cancelada: '<span class="badge badge-red">Cancelada</span>',
+  };
+
+  tbody.innerHTML = [...vf].reverse().map((v, idx) => {
+    const lucroV = (v.valor - v.custo) * v.qtd;
+    const cls = lucroV >= 0 ? 'profit-positive' : 'profit-negative';
+    const dt = new Date(v.data + 'T12:00:00').toLocaleDateString('pt-BR');
+    const realIdx = state.vendas.length - 1 - state.vendas.slice().reverse().findIndex(x => x === v);
+    return `<tr>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:0.8rem">${dt}</td>
+      <td><strong>${v.nome}</strong></td>
+      <td style="text-align:center">${v.qtd}x</td>
+      <td style="font-family:'JetBrains Mono',monospace">${fmt(v.custo * v.qtd)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;color:#C8830A">${fmt(v.valor * v.qtd)}</td>
+      <td style="font-family:'JetBrains Mono',monospace" class="${cls}">${fmt(lucroV)}</td>
+      <td><span class="badge badge-purple">${pagMap[v.pagamento] || '—'}</span></td>
+      <td>${statusBadge[v.status] || '<span class="badge badge-gray">—</span>'}</td>
+      <td>${v.cliente || '—'}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="delVenda(${realIdx})">🗑️</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function calcVenda() {
+  const qtd = Number(document.getElementById('venda-qtd').value) || 1;
+  const custo = Number(document.getElementById('venda-custo').value) || 0;
+  const valor = Number(document.getElementById('venda-valor').value) || 0;
+  const preview = document.getElementById('venda-preview');
+
+  if (custo > 0 || valor > 0) {
+    preview.style.display = 'block';
+    const lucro = (valor - custo) * qtd;
+    document.getElementById('vp-custo').textContent = fmt(custo * qtd);
+    document.getElementById('vp-receita').textContent = fmt(valor * qtd);
+    document.getElementById('vp-lucro').textContent = fmt(lucro);
+    document.getElementById('vp-lucro').className = lucro >= 0 ? 'profit-positive' : 'profit-negative';
+  } else {
+    preview.style.display = 'none';
+  }
+}
+
+function salvarVenda() {
+  const obj = {
+    id: genId(),
+    pecaId: document.getElementById('venda-peca').value ? Number(document.getElementById('venda-peca').value) : null,
+    nome: document.getElementById('venda-nome').value || 'Produto',
+    qtd: Number(document.getElementById('venda-qtd').value) || 1,
+    custo: Number(document.getElementById('venda-custo').value) || 0,
+    valor: Number(document.getElementById('venda-valor').value) || 0,
+    data: document.getElementById('venda-data').value || new Date().toISOString().split('T')[0],
+    cliente: document.getElementById('venda-cliente').value,
+    pagamento: document.getElementById('venda-pagamento').value || 'pix',
+    status: document.getElementById('venda-status').value || 'entregue',
+  };
+  state.vendas.push(obj);
+  saveState();
+  closeModal('modal-venda');
+  renderVendas();
+}
+
+// ============== CALCULADORA ==============
+function renderCalc() {
+  populateFilamentosSelect();
+  calcular();
+}
+
+function calcular() {
+  const filId = document.getElementById('calc-filamento').value;
+  const peso = Number(document.getElementById('calc-peso').value) || 0;
+  const falhasPct = Number(document.getElementById('calc-falha').value) || 0;
+  const tempo = tempoEmHoras(
+    document.getElementById('calc-tempo-h').value,
+    document.getElementById('calc-tempo-m').value
+  );
+  const watts = Number(document.getElementById('calc-watts').value) || 0;
+  const tarifa = Number(document.getElementById('calc-tarifa').value) || 0;
+  const horaValor = Number(document.getElementById('calc-hora-valor').value) || 0;
+  const preparoMin = Number(document.getElementById('calc-preparo').value) || 0;
+  const desgaste = Number(document.getElementById('calc-desgaste').value) || 0;
+  const embalagem = Number(document.getElementById('calc-embalagem').value) || 0;
+  const outros = Number(document.getElementById('calc-outros').value) || 0;
+  const margem = Number(document.getElementById('calc-margem').value) || 0;
+  const imposto = Number(document.getElementById('calc-imposto').value) || 0;
+
+  // 1. MATERIAL
+  let cFilamento = 0, cFilFalha = 0;
+  const detBox = document.getElementById('calc-fil-detalhe');
+  if (filId) {
+    const fil = state.filamentos.find(f => f.id === Number(filId));
+    if (fil) {
+      const cpg = fil.custo / 1000; // custo por grama
+      cFilamento = cpg * peso;
+      cFilFalha = cFilamento * (falhasPct / 100);
+      detBox.style.display = 'block';
+      document.getElementById('calc-fil-detalhe-txt').innerHTML =
+        `<span class="color-dot" style="background:${fil.corHex}"></span>
+         ${fil.nome} · Estoque: ${fmtKg(fil.estoque)} · R$ ${cpg.toFixed(4)}/g × ${peso}g = <strong style="color:#ffffff">${fmt(cFilamento)}</strong>`;
+    }
+  } else {
+    detBox.style.display = 'none';
+  }
+
+  // 2. ENERGIA: kWh = (Watts × horas) / 1000
+  const kWh = (watts * tempo) / 1000;
+  const cEnergia = kWh * tarifa;
+
+  // 3. MÃO DE OBRA (preparo em minutos → horas)
+  const cPreparo = (preparoMin / 60) * horaValor;
+
+  // 4. CUSTO TOTAL
+  const cTotal = cFilamento + cFilFalha + cEnergia + cPreparo + desgaste + embalagem + outros;
+
+  // 5. PREÇO FINAL
+  const lucroVal = cTotal * (margem / 100);
+  const subTotal = cTotal + lucroVal;
+  const impostoVal = subTotal * (imposto / 100);
+  const precoFinal = subTotal + impostoVal;
+
+  // 6. INDICADORES
+  const cpgReal = peso > 0 ? cTotal / peso : 0;
+  const lucroHora = tempo > 0 ? lucroVal / tempo : 0;
+  const custoHora = tempo > 0 ? cTotal / tempo : 0;
+  const margemReal = precoFinal > 0 ? (lucroVal / precoFinal) * 100 : 0;
+
+  // ATUALIZAR UI
+  document.getElementById('c-filamento').textContent = fmt(cFilamento);
+  document.getElementById('c-falha').textContent = fmt(cFilFalha);
+  document.getElementById('c-energia').textContent = fmt(cEnergia);
+  document.getElementById('c-energia-detalhe').textContent = watts && tempo ? `${watts}W × ${exibirTempo(tempo)} = ${kWh.toFixed(3)} kWh × R$ ${tarifa.toFixed(2)}/kWh` : '—';
+  document.getElementById('c-preparo').textContent = fmt(cPreparo);
+  document.getElementById('c-desgaste').textContent = fmt(desgaste);
+  document.getElementById('c-embalagem').textContent = fmt(embalagem);
+  document.getElementById('c-outros').textContent = fmt(outros);
+  document.getElementById('c-total').textContent = fmt(cTotal);
+
+  document.getElementById('p-custo').textContent = fmt(cTotal);
+  document.getElementById('p-custo-inline').textContent = fmt(cTotal);
+  document.getElementById('lbl-margem').textContent = margem;
+  document.getElementById('p-margem').textContent = fmt(lucroVal);
+  document.getElementById('p-imposto').textContent = fmt(impostoVal);
+  document.getElementById('p-final').textContent = fmt(precoFinal);
+  document.getElementById('p-final2').textContent = fmt(precoFinal);
+  document.getElementById('p-lucro-inline').textContent = fmt(lucroVal);
+
+  document.getElementById('r-gramas').textContent = peso > 0 ? 'R$ ' + cpgReal.toFixed(4).replace('.', ',') + '/g' : '—';
+  document.getElementById('r-hora-custo').textContent = tempo > 0 ? fmt(custoHora) + '/h' : '—';
+  document.getElementById('r-hora').textContent = tempo > 0 ? fmt(lucroHora) + '/h' : '—';
+  document.getElementById('r-margem-real').textContent = precoFinal > 0 ? margemReal.toFixed(1) + '%' : '—';
+}
+
+function salvarComoVenda() {
+  populatePecasSelect();
+  const precoFinal = document.getElementById('p-final').textContent;
+  const custo = document.getElementById('c-total').textContent;
+  document.getElementById('venda-nome').value = 'Impressão personalizada';
+  document.getElementById('venda-custo').value = parseFloat(custo.replace('R$ ', '').replace(',', '.')) || 0;
+  document.getElementById('venda-valor').value = parseFloat(precoFinal.replace('R$ ', '').replace(',', '.')) || 0;
+  document.getElementById('venda-data').value = new Date().toISOString().split('T')[0];
+  calcVenda();
+  openModal('modal-venda');
+}
+
+// ============== IMPRESSÕES ==============
+function populateFilamentosSelectImp() {
+  const el = document.getElementById('imp-filamento');
+  el.innerHTML = '<option value="">Selecione o filamento...</option>' +
+    state.filamentos.map(f => `<option value="${f.id}">${f.nome} (${f.tipo}) — ${fmtKg(f.estoque)} disponíveis</option>`).join('');
+}
+
+function populatePecasSelectImp() {
+  const el = document.getElementById('imp-peca');
+  el.innerHTML = '<option value="">Nenhuma</option>' +
+    state.pecas.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
+}
+
+function preencherImpressaoPeca() {
+  const id = document.getElementById('imp-peca').value;
+  if (!id) return;
+  const p = state.pecas.find(x => x.id === Number(id));
+  if (p) {
+    document.getElementById('imp-nome').value = p.nome;
+    document.getElementById('imp-consumo').value = p.peso;
+    document.getElementById('imp-tempo-h').value = Math.floor(p.tempo || 0);
+    document.getElementById('imp-tempo-m').value = Math.round(((p.tempo || 0) - Math.floor(p.tempo || 0)) * 60);
+    if (p.filamento) document.getElementById('imp-filamento').value = p.filamento;
+    atualizarInfoFilamento();
+    calcImpressao();
+  }
+}
+
+function atualizarInfoFilamento() {
+  const filId = document.getElementById('imp-filamento').value;
+  const infoBox = document.getElementById('imp-fil-info');
+  if (!filId) { infoBox.style.display = 'none'; return; }
+  const fil = state.filamentos.find(f => f.id === Number(filId));
+  if (fil) {
+    infoBox.style.display = 'block';
+    document.getElementById('imp-fil-info-txt').innerHTML =
+      `<span class="color-dot" style="background:${fil.corHex}"></span>
+       <strong>${fil.nome}</strong> · ${fil.tipo} · 
+       Estoque: <strong>${fmtKg(fil.estoque)}</strong> · 
+       Custo: R$ ${(fil.custo/1000).toFixed(4)}/g`;
+  }
+  calcImpressao();
+}
+
+function calcImpressao() {
+  const filId = document.getElementById('imp-filamento').value;
+  const consumo = Number(document.getElementById('imp-consumo').value) || 0;
+  const alerta = document.getElementById('imp-alerta');
+  const alertaTxt = document.getElementById('imp-alerta-txt');
+
+  document.getElementById('ip-consumo').textContent = consumo ? consumo + 'g' : '—';
+
+  if (filId) {
+    const fil = state.filamentos.find(f => f.id === Number(filId));
+    if (fil) {
+      const consumoKg = consumo / 1000;
+      const aposKg = fil.estoque - consumoKg;
+      const custo = (fil.custo / 1000) * consumo;
+      document.getElementById('ip-fil').textContent = fil.nome + ' (' + fil.tipo + ')';
+      document.getElementById('ip-estoque-atual').textContent = fmtKg(fil.estoque);
+      document.getElementById('ip-estoque-apos').textContent = fmtKg(aposKg);
+      document.getElementById('ip-estoque-apos').style.color = aposKg < 0 ? 'var(--danger)' : aposKg <= fil.minimo ? '#C8830A' : '#C8830A';
+      document.getElementById('ip-custo').textContent = fmt(custo);
+
+      if (aposKg < 0) {
+        alerta.style.display = 'block';
+        alertaTxt.textContent = `Estoque insuficiente! Você tem ${fmtKg(fil.estoque)} mas a impressão precisa de ${fmtKg(consumoKg)}.`;
+      } else if (aposKg <= fil.minimo) {
+        alerta.style.display = 'block';
+        alertaTxt.textContent = `Após esta impressão, o estoque de "${fil.nome}" ficará em ${fmtKg(aposKg)} — abaixo do mínimo de ${fil.minimo} kg. Considere reabastecer.`;
+        alerta.style.background = 'rgba(255,107,53,0.12)';
+        alerta.style.borderColor = 'rgba(255,107,53,0.4)';
+        alerta.style.color = '#C8830A';
+      } else {
+        alerta.style.display = 'none';
+      }
+      return;
+    }
+  }
+  document.getElementById('ip-fil').textContent = '—';
+  document.getElementById('ip-estoque-atual').textContent = '—';
+  document.getElementById('ip-estoque-apos').textContent = '—';
+  document.getElementById('ip-custo').textContent = '—';
+  alerta.style.display = 'none';
+}
+
+function salvarImpressao() {
+  const filId = document.getElementById('imp-filamento').value;
+  const consumo = Number(document.getElementById('imp-consumo').value) || 0;
+  const status = document.getElementById('imp-status').value;
+  const editIdx = document.getElementById('modal-impressao').dataset.editIdx;
+  const isEdit = editIdx !== undefined && editIdx !== '';
+
+  if (!filId) { alert('Selecione o filamento utilizado.'); return; }
+  if (!consumo) { alert('Informe o consumo em gramas.'); return; }
+
+  const fil = state.filamentos.find(f => f.id === Number(filId));
+  if (!fil) return;
+
+  // Se for nova impressão, desconta do estoque
+  // Se for edição, devolve o consumo antigo e desconta o novo
+  if (isEdit) {
+    const antiga = state.impressoes[Number(editIdx)];
+    if (antiga && antiga.status !== 'falhou') {
+      fil.estoque = fil.estoque + (antiga.consumo / 1000); // devolve
+    }
+  }
+
+  if (status !== 'falhou') {
+    if (fil.estoque < consumo / 1000) {
+      if (!confirm(`Estoque insuficiente! Você tem ${fmtKg(fil.estoque)} e a impressão consome ${fmtKg(consumo/1000)}. Deseja registrar mesmo assim?`)) return;
+    }
+    fil.estoque = Math.max(0, fil.estoque - consumo / 1000);
+  }
+
+  const custo = (fil.custo / 1000) * consumo;
+  const obj = {
+    id: isEdit ? state.impressoes[Number(editIdx)].id : genId(),
+    nome: document.getElementById('imp-nome').value || 'Impressão',
+    filamentoId: Number(filId),
+    filamentoNome: fil.nome,
+    filamentoTipo: fil.tipo,
+    filamentoCorHex: fil.corHex,
+    consumo, custo,
+    tempo: tempoEmHoras(document.getElementById('imp-tempo-h').value, document.getElementById('imp-tempo-m').value),
+    data: document.getElementById('imp-data').value || new Date().toISOString().split('T')[0],
+    status,
+    obs: document.getElementById('imp-obs').value,
+    pecaId: document.getElementById('imp-peca').value ? Number(document.getElementById('imp-peca').value) : null,
+  };
+
+  if (!state.impressoes) state.impressoes = [];
+
+  if (isEdit) {
+    state.impressoes[Number(editIdx)] = obj;
+  } else {
+    state.impressoes.push(obj);
+  }
+
+  // Limpa modo de edição
+  delete document.getElementById('modal-impressao').dataset.editIdx;
+  document.querySelector('#modal-impressao h3').textContent = 'Registrar Impressão';
+
+  saveState();
+  closeModal('modal-impressao');
+  renderImpressoes();
+}
+
+function renderImpressoes() {
+  if (!state.impressoes) state.impressoes = [];
+  const tbody = document.getElementById('imp-tbody');
+  const cards = document.getElementById('imp-cards');
+  const count = document.getElementById('imp-count');
+
+  count.textContent = state.impressoes.length + ' registros';
+
+  const totalConsumo = state.impressoes.filter(i => i.status !== 'falhou').reduce((s, i) => s + i.consumo, 0);
+  const totalCusto = state.impressoes.filter(i => i.status !== 'falhou').reduce((s, i) => s + i.custo, 0);
+  const concluidas = state.impressoes.filter(i => i.status === 'concluida').length;
+  const falhas = state.impressoes.filter(i => i.status === 'falhou').length;
+
+  cards.innerHTML = `
+    <div class="card purple"><div class="card-label">Total Impressões</div><div class="card-value">${state.impressoes.length}</div><div class="card-sub">${concluidas} concluídas</div></div>
+    <div class="card orange"><div class="card-label">Filamento Consumido</div><div class="card-value">${totalConsumo.toFixed(0)}g</div><div class="card-sub">${(totalConsumo/1000)} kg no total</div></div>
+    <div class="card red"><div class="card-label">Custo de Material</div><div class="card-value">${fmt(totalCusto)}</div><div class="card-sub">Apenas filamento</div></div>
+    <div class="card ${falhas > 0 ? 'red' : 'green'}"><div class="card-label">Falhas / Descartes</div><div class="card-value">${falhas}</div><div class="card-sub">${falhas > 0 ? fmt(state.impressoes.filter(i=>i.status==='falhou').reduce((s,i)=>s+i.custo,0)) + ' desperdiçados' : 'Nenhuma falha!'}</div></div>
+  `;
+
+  if (!state.impressoes.length) {
+    tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="es-icon">⚙️</div><p>Nenhuma impressão registrada ainda</p><button class="btn btn-primary" onclick="openModal(\'modal-impressao\')">+ Registrar Impressão</button></div></td></tr>';
+    return;
+  }
+
+  const statusMap = {
+    concluida: '<span class="badge badge-green">Concluída</span>',
+    andamento: '<span class="badge badge-orange">Em andamento</span>',
+    falhou: '<span class="badge badge-red">Falhou</span>',
+  };
+
+  tbody.innerHTML = [...state.impressoes].reverse().map((i, idx) => {
+    const dt = new Date(i.data + 'T12:00:00').toLocaleDateString('pt-BR');
+    const realIdx = state.impressoes.length - 1 - idx;
+    return `<tr>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:0.8rem">${dt}</td>
+      <td><strong>${i.nome}</strong>${i.obs ? `<br><span style="font-size:0.75rem;color:rgba(255,255,255,0.45)">${i.obs}</span>` : ''}</td>
+      <td><span class="color-dot" style="background:${i.filamentoCorHex}"></span>${i.filamentoNome}</td>
+      <td style="font-family:'JetBrains Mono',monospace">${i.status === 'falhou' ? '<span style="color:rgba(255,255,255,0.45)">—</span>' : i.consumo + 'g'}</td>
+      <td style="font-family:'JetBrains Mono',monospace">${i.status === 'falhou' ? '<span style="color:rgba(255,255,255,0.45)">—</span>' : fmt(i.custo)}</td>
+      <td style="color:rgba(255,255,255,0.45)">${i.tempo ? exibirTempo(i.tempo) : '—'}</td>
+      <td>${statusMap[i.status] || ''}</td>
+      <td>
+        <div class="btn-row">
+          <button class="btn btn-ghost btn-sm" onclick="editImpressao(${realIdx})">✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="delImpressao(${realIdx})">🗑️</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ============== DASHBOARD ==============
+function renderDashboard() {
+  if (!state.impressoes) state.impressoes = [];
+  const total = state.vendas.reduce((s, v) => s + v.valor * v.qtd, 0);
+  const custoTotal = state.vendas.reduce((s, v) => s + v.custo * v.qtd, 0);
+  const lucro = total - custoTotal;
+  const baixo = state.filamentos.filter(f => f.estoque <= f.minimo);
+  const totalConsumoG = state.impressoes.filter(i => i.status !== 'falhou').reduce((s, i) => s + i.consumo, 0);
+
+  // Vendas do mês atual
+  const agora = new Date();
+  const vendasMes = state.vendas.filter(v => {
+    const d = new Date(v.data + 'T12:00:00');
+    return d.getMonth() === agora.getMonth() && d.getFullYear() === agora.getFullYear();
+  });
+  const receitaMes = vendasMes.reduce((s, v) => s + v.valor * v.qtd, 0);
+  const lucroMes = vendasMes.reduce((s, v) => s + (v.valor - v.custo) * v.qtd, 0);
+  const pendentes = state.vendas.filter(v => v.status === 'pendente').length;
+
+  const totalGastos = (state.gastos || []).reduce((s, g) => s + g.valor, 0);
+  const lucroReal = total - custoTotal - totalGastos;
+
+  document.getElementById('dash-cards').innerHTML = `
+    <div class="card green"><div class="card-label">Receita Total</div><div class="card-value">${fmt(total)}</div><div class="card-sub">Lucro bruto: ${fmt(lucro)}</div></div>
+    <div class="card purple"><div class="card-label">Este Mês</div><div class="card-value">${fmt(receitaMes)}</div><div class="card-sub">Lucro: ${fmt(lucroMes)}</div></div>
+    <div class="card ${lucroReal >= 0 ? 'green' : 'red'}"><div class="card-label">Lucro Real</div><div class="card-value ${lucroReal >= 0 ? 'profit-positive' : 'profit-negative'}">${fmt(lucroReal)}</div><div class="card-sub">Descontando ${fmt(totalGastos)} em gastos</div></div>
+    <div class="card ${pendentes > 0 ? 'orange' : baixo.length > 0 ? 'red' : 'green'}"><div class="card-label">Atenção</div><div class="card-value">${pendentes + baixo.length}</div><div class="card-sub">${pendentes} pendente(s) · ${baixo.length} estoque baixo</div></div>
+  `;
+
+  // Últimas vendas
+  const recentes = [...state.vendas].reverse().slice(0, 5);
+  document.getElementById('dash-vendas-recentes').innerHTML = recentes.length ?
+    `<table><thead><tr><th>Peça</th><th>Valor</th><th>Lucro</th></tr></thead><tbody>` +
+    recentes.map(v => {
+      const l = (v.valor - v.custo) * v.qtd;
+      return `<tr><td>${v.nome}</td><td style="font-family:'JetBrains Mono',monospace">${fmt(v.valor * v.qtd)}</td><td class="${l >= 0 ? 'profit-positive' : 'profit-negative'}" style="font-family:'JetBrains Mono',monospace">${fmt(l)}</td></tr>`;
+    }).join('') + '</tbody></table>'
+    : '<div class="empty-state"><div class="es-icon">📋</div><p>Sem vendas ainda</p></div>';
+
+  // Filamentos baixo estoque
+  document.getElementById('dash-filamentos-baixo').innerHTML = baixo.length ?
+    `<table><thead><tr><th>Filamento</th><th>Estoque</th><th>Mínimo</th></tr></thead><tbody>` +
+    baixo.map(f => `<tr><td><span class="color-dot" style="background:${f.corHex}"></span>${f.nome}</td><td style="color:var(--danger);font-family:'JetBrains Mono',monospace">${fmtKg(f.estoque)}</td><td style="font-family:'JetBrains Mono',monospace;color:rgba(255,255,255,0.45)">${fmtKg(f.minimo)}</td></tr>`).join('') + '</tbody></table>'
+    : '<div class="empty-state"><div class="es-icon">✅</div><p>Todos os estoques estão OK</p></div>';
+}
+
+// ============== DELEGAÇÃO GLOBAL DE CLIQUES ==============
+// ============== MODAL DE CONFIRMAÇÃO ==============
+let _confirmCallback = null;
+
+function confirmar(mensagem, callback) {
+  _confirmCallback = callback;
+  document.getElementById('confirm-msg').textContent = mensagem;
+  document.getElementById('modal-confirm').classList.add('open');
+}
+
+function executarConfirm() {
+  document.getElementById('modal-confirm').classList.remove('open');
+  if (typeof _confirmCallback === 'function') {
+    _confirmCallback();
+  }
+  _confirmCallback = null;
+}
+
+function fecharConfirm() {
+  document.getElementById('modal-confirm').classList.remove('open');
+  _confirmCallback = null;
+}
+
+// ============== EXCLUSÕES ==============
+function delFilamento(idx) {
+  confirmar('Deseja realmente excluir este filamento? Esta ação não pode ser desfeita.', function() {
+    state.filamentos.splice(idx, 1);
+    saveState();
+    renderFilamentos();
+  });
+}
+
+function delPeca(idx) {
+  confirmar('Deseja realmente excluir esta peça do catálogo?', function() {
+    state.pecas.splice(idx, 1);
+    saveState();
+    renderPecas();
+  });
+}
+
+function delVenda(idx) {
+  confirmar('Deseja realmente excluir esta venda do histórico?', function() {
+    // vendas são renderizadas em ordem reversa, calcular índice real
+    const realIdx = state.vendas.length - 1 - idx;
+    state.vendas.splice(realIdx, 1);
+    saveState();
+    renderVendas();
+  });
+}
+
+function delImpressao(idx) {
+  confirmar('Deseja realmente excluir esta impressão?\n\nO filamento descontado NÃO será devolvido ao estoque automaticamente.', function() {
+    state.impressoes.splice(idx, 1);
+    saveState();
+    renderImpressoes();
+  });
+}
+
+function editImpressao(idx) {
+  const i = state.impressoes[idx];
+  if (!i) return;
+  populateFilamentosSelectImp();
+  populatePecasSelectImp();
+  document.getElementById('imp-nome').value = i.nome;
+  document.getElementById('imp-filamento').value = i.filamentoId || '';
+  document.getElementById('imp-consumo').value = i.consumo;
+  document.getElementById('imp-tempo-h').value = Math.floor(i.tempo || 0);
+  document.getElementById('imp-tempo-m').value = Math.round(((i.tempo || 0) - Math.floor(i.tempo || 0)) * 60);
+  document.getElementById('imp-data').value = i.data;
+  document.getElementById('imp-status').value = i.status;
+  document.getElementById('imp-obs').value = i.obs || '';
+  document.getElementById('modal-impressao').dataset.editIdx = idx;
+  document.querySelector('#modal-impressao h3').textContent = 'Editar Impressão';
+  atualizarInfoFilamento();
+  calcImpressao();
+  document.getElementById('modal-impressao').classList.add('open');
+}
+
+// ============== CLOSE MODAL ON BG ==============
+document.querySelectorAll('.modal-bg').forEach(bg => {
+  bg.addEventListener('click', function(e) {
+    if (e.target === this) {
+      this.classList.remove('open');
+      clearForms(this.id);
+    }
+  });
+});
+
+// ============== ANÁLISE MENSAL ==============
+let _anIndicador = 'receita';
+
+const anIndicadorConfig = {
+  receita:     { label: 'Receita',           cor: '#C8830A', fmt: v => fmt(v),              titulo: 'Receita Bruta por Mês' },
+  lucro_bruto: { label: 'Lucro Bruto',       cor: '#C8830A', fmt: v => fmt(v),              titulo: 'Lucro Bruto por Mês' },
+  lucro_real:  { label: 'Lucro Real',        cor: '#C8830A', fmt: v => fmt(v),              titulo: 'Lucro Real por Mês' },
+  gastos:      { label: 'Gastos Op.',        cor: '#ff4d6d', fmt: v => fmt(v),              titulo: 'Gastos Operacionais por Mês' },
+  vendas_qtd:  { label: 'Qtd. Vendas',      cor: '#4cc9f0', fmt: v => v + ' venda(s)',      titulo: 'Quantidade de Vendas por Mês' },
+  ticket_medio:{ label: 'Ticket Médio',      cor: '#ffd166', fmt: v => fmt(v),              titulo: 'Ticket Médio por Mês' },
+  margem:      { label: 'Margem %',          cor: '#a78bfa', fmt: v => v.toFixed(1) + '%',  titulo: 'Margem de Lucro Real por Mês' },
+  filamento:   { label: 'Filamento (g)',     cor: '#C8830A', fmt: v => v.toFixed(0) + 'g',  titulo: 'Filamento Consumido por Mês' },
+};
+
+function selecionarIndicador(ind, btn) {
+  _anIndicador = ind;
+  document.querySelectorAll('.an-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderAnalise();
+}
+
+function inicializarAnalise() {
+  const selAno = document.getElementById('an-ano');
+  const agora = new Date();
+  const anos = new Set([agora.getFullYear()]);
+  (state.vendas||[]).forEach(v => anos.add(new Date(v.data+'T12:00:00').getFullYear()));
+  (state.gastos||[]).forEach(g => anos.add(new Date(g.data+'T12:00:00').getFullYear()));
+  selAno.innerHTML = [...anos].sort((a,b)=>b-a).map(a =>
+    `<option value="${a}" ${a===agora.getFullYear()?'selected':''}>${a}</option>`
+  ).join('');
+}
+
+function renderAnalise() {
+  if (!state.gastos) state.gastos = [];
+  const ano = Number(document.getElementById('an-ano').value);
+  const cfg = anIndicadorConfig[_anIndicador];
+
+  // Calcular dados dos 12 meses
+  const dados = mesesNomes.map((nome, mi) => {
+    const r = calcularDREPeriodo(mi, ano);
+    return {
+      nome, mes: mi, ano,
+      receita:     r.receitaBruta,
+      lucro_bruto: r.lucroBruto,
+      lucro_real:  r.lucroReal,
+      gastos:      r.gastosOp,
+      vendas_qtd:  r.totalVendas,
+      ticket_medio:r.ticketMedio,
+      margem:      r.margemReal,
+      filamento:   r.filamentoUsado,
+      custoProd:   r.custoProd,
+    };
+  });
+
+  const valores = dados.map(d => d[_anIndicador]);
+  const maxVal = Math.max(...valores.map(v => Math.abs(v)), 1);
+  const totalAno = _anIndicador === 'margem'
+    ? (valores.filter(v=>v!==0).reduce((s,v)=>s+v,0) / (valores.filter(v=>v!==0).length||1))
+    : valores.reduce((s,v)=>s+v,0);
+
+  const melhorIdx = valores.indexOf(Math.max(...valores));
+  const piorIdx = valores.indexOf(Math.min(...valores.filter(v=>v!==0)));
+
+  // Label total
+  document.getElementById('an-total-label').innerHTML =
+    `<span style="color:rgba(255,255,255,0.45)">Total ${ano}:</span> <strong style="color:${cfg.cor}">${cfg.fmt(totalAno)}</strong>`;
+  document.getElementById('an-grafico-titulo').textContent = cfg.titulo;
+
+  // Gráfico de barras
+  const grafico = document.getElementById('an-grafico');
+  const labels  = document.getElementById('an-meses-labels');
+  grafico.innerHTML = dados.map((d, i) => {
+    const val = d[_anIndicador];
+    const pct = Math.abs(val) / maxVal * 100;
+    const cor = val < 0 ? 'var(--danger)' : cfg.cor;
+    const isAtual = i === new Date().getMonth() && ano === new Date().getFullYear();
+    return `<div class="an-bar-wrap" title="${d.nome}: ${cfg.fmt(val)}">
+      <div class="an-bar-val">${val !== 0 ? cfg.fmt(val) : ''}</div>
+      <div class="an-bar" style="height:${Math.max(pct,2)}%;background:${cor};opacity:${isAtual?'1':'0.75'};border:${isAtual?'2px solid #fff':'none'}"></div>
+    </div>`;
+  }).join('');
+  labels.innerHTML = dados.map((d,i) => `<div style="flex:1;text-align:center;font-size:0.68rem;color:rgba(255,255,255,0.45);font-weight:${i===new Date().getMonth()&&ano===new Date().getFullYear()?'800':'400'}">${d.nome.substring(0,3)}</div>`).join('');
+
+  // Cards dos meses
+  const cards = document.getElementById('an-meses-cards');
+  cards.innerHTML = dados.filter(d => d.receita > 0 || d.gastos > 0).map((d, i) => {
+    const isMelhor = mesesNomes.indexOf(d.nome) === melhorIdx;
+    const isPior   = mesesNomes.indexOf(d.nome) === piorIdx && d.receita > 0;
+    const tag = isMelhor ? '<span class="badge badge-green" style="font-size:0.65rem">Melhor mês</span>' :
+                isPior   ? '<span class="badge badge-red" style="font-size:0.65rem">Pior mês</span>' : '';
+    return `<div class="an-mes-card ${isMelhor?'melhor':isPior?'pior':''}">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <strong style="font-size:0.9rem">${d.nome}</strong>${tag}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+        <div style="font-size:0.72rem;color:rgba(255,255,255,0.45)">Receita</div>
+        <div style="font-size:0.72rem;text-align:right;font-family:'JetBrains Mono',monospace;color:#C8830A">${fmt(d.receita)}</div>
+        <div style="font-size:0.72rem;color:rgba(255,255,255,0.45)">Lucro Bruto</div>
+        <div style="font-size:0.72rem;text-align:right;font-family:'JetBrains Mono',monospace;color:#C8830A">${fmt(d.lucro_bruto)}</div>
+        <div style="font-size:0.72rem;color:rgba(255,255,255,0.45)">Gastos Op.</div>
+        <div style="font-size:0.72rem;text-align:right;font-family:'JetBrains Mono',monospace;color:var(--danger)">− ${fmt(d.gastos)}</div>
+        <div style="font-size:0.72rem;color:rgba(255,255,255,0.45)">Lucro Real</div>
+        <div style="font-size:0.72rem;text-align:right;font-family:'JetBrains Mono',monospace;font-weight:700;color:${d.lucro_real>=0?'#C8830A':'var(--danger)'}">${fmt(d.lucro_real)}</div>
+      </div>
+      <div style="height:1px;background:rgba(200,131,10,0.2);margin:8px 0;"></div>
+      <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:rgba(255,255,255,0.45);">
+        <span>${d.vendas_qtd} venda(s)</span>
+        <span>Ticket: ${fmt(d.ticket_medio)}</span>
+        <span>${d.margem.toFixed(1)}% margem</span>
+      </div>
+    </div>`;
+  }).join('') || '<div class="empty-state" style="grid-column:1/-1"><div class="es-icon">📅</div><p>Nenhum dado para este ano</p></div>';
+
+  // Tabela completa
+  const tbody = document.getElementById('an-tabela');
+  let totReceita=0, totCusto=0, totLBruto=0, totGastos=0, totLReal=0, totVendas=0, totFil=0;
+  tbody.innerHTML = dados.map((d,i) => {
+    if (d.receita === 0 && d.gastos === 0) return '';
+    totReceita+=d.receita; totCusto+=d.custoProd; totLBruto+=d.lucro_bruto;
+    totGastos+=d.gastos; totLReal+=d.lucro_real; totVendas+=d.vendas_qtd; totFil+=d.filamento;
+    const isMes = i === new Date().getMonth() && ano === new Date().getFullYear();
+    return `<tr style="${isMes?'background:rgba(255,107,53,0.06);':''}">
+      <td><strong>${d.nome}</strong>${isMes?' <span class="badge badge-orange" style="font-size:0.6rem">Atual</span>':''}</td>
+      <td style="font-family:'JetBrains Mono',monospace;color:#C8830A">${fmt(d.receita)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;color:var(--danger)">− ${fmt(d.custoProd)}</td>
+      <td style="font-family:'JetBrains Mono',monospace">${fmt(d.lucro_bruto)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;color:var(--danger)">− ${fmt(d.gastos)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-weight:700" class="${d.lucro_real>=0?'profit-positive':'profit-negative'}">${fmt(d.lucro_real)}</td>
+      <td><span class="badge ${d.margemReal>=0?'badge-green':'badge-red'}">${d.margem.toFixed(1)}%</span></td>
+      <td style="text-align:center">${d.vendas_qtd}</td>
+      <td style="font-family:'JetBrains Mono',monospace">${fmt(d.ticket_medio)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;color:rgba(255,255,255,0.45)">${d.filamento.toFixed(0)}g</td>
+    </tr>`;
+  }).join('');
+
+  const mLReal = totReceita > 0 ? (totLReal/totReceita*100).toFixed(1) : '0.0';
+  const tMedia = totVendas > 0 ? fmt(totReceita/totVendas) : fmt(0);
+  document.getElementById('an-totais').innerHTML = `<tr>
+    <td>TOTAL ${ano}</td>
+    <td style="font-family:'JetBrains Mono',monospace;color:#C8830A">${fmt(totReceita)}</td>
+    <td style="font-family:'JetBrains Mono',monospace;color:var(--danger)">− ${fmt(totCusto)}</td>
+    <td style="font-family:'JetBrains Mono',monospace">${fmt(totLBruto)}</td>
+    <td style="font-family:'JetBrains Mono',monospace;color:var(--danger)">− ${fmt(totGastos)}</td>
+    <td style="font-family:'JetBrains Mono',monospace;font-weight:800" class="${totLReal>=0?'profit-positive':'profit-negative'}">${fmt(totLReal)}</td>
+    <td><span class="badge ${totLReal>=0?'badge-green':'badge-red'}">${mLReal}%</span></td>
+    <td style="text-align:center">${totVendas}</td>
+    <td style="font-family:'JetBrains Mono',monospace">${tMedia}</td>
+    <td style="font-family:'JetBrains Mono',monospace;color:rgba(255,255,255,0.45)">${totFil.toFixed(0)}g</td>
+  </tr>`;
+}
+
+// ============== DRE ==============
+const mesesNomes = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+let _dreAnoCompleto = false;
+
+function inicializarDRE() {
+  const agora = new Date();
+  const selMes = document.getElementById('dre-mes');
+  const selAno = document.getElementById('dre-ano');
+
+  selMes.innerHTML = mesesNomes.map((m, i) =>
+    `<option value="${i}" ${i === agora.getMonth() ? 'selected' : ''}>${m}</option>`
+  ).join('');
+
+  const anos = new Set();
+  const anoAtual = agora.getFullYear();
+  for (let a = anoAtual - 2; a <= anoAtual; a++) anos.add(a);
+  (state.vendas || []).forEach(v => anos.add(new Date(v.data+'T12:00:00').getFullYear()));
+  (state.gastos || []).forEach(g => anos.add(new Date(g.data+'T12:00:00').getFullYear()));
+  selAno.innerHTML = [...anos].sort((a,b)=>b-a).map(a =>
+    `<option value="${a}" ${a === anoAtual ? 'selected' : ''}>${a}</option>`
+  ).join('');
+}
+
+function calcularDREPeriodo(mes, ano, somenteAno = false) {
+  const vendas = (state.vendas || []).filter(v => {
+    const d = new Date(v.data+'T12:00:00');
+    return somenteAno ? d.getFullYear() === ano : d.getMonth() === mes && d.getFullYear() === ano;
+  });
+  const gastos = (state.gastos || []).filter(g => {
+    const d = new Date(g.data+'T12:00:00');
+    return somenteAno ? d.getFullYear() === ano : d.getMonth() === mes && d.getFullYear() === ano;
+  });
+  const impressoes = (state.impressoes || []).filter(i => {
+    const d = new Date(i.data+'T12:00:00');
+    return i.status !== 'falhou' && (somenteAno ? d.getFullYear() === ano : d.getMonth() === mes && d.getFullYear() === ano);
+  });
+
+  const receitaBruta   = vendas.reduce((s,v) => s + v.valor * v.qtd, 0);
+  const custoProd      = vendas.reduce((s,v) => s + v.custo * v.qtd, 0);
+  const lucroBruto     = receitaBruta - custoProd;
+  const margemBruta    = receitaBruta > 0 ? (lucroBruto / receitaBruta) * 100 : 0;
+
+  const gastosOp       = gastos.reduce((s,g) => s + g.valor, 0);
+  const gastosCat      = {};
+  gastos.forEach(g => { gastosCat[g.categoria] = (gastosCat[g.categoria] || 0) + g.valor; });
+
+  const lucroReal      = lucroBruto - gastosOp;
+  const margemReal     = receitaBruta > 0 ? (lucroReal / receitaBruta) * 100 : 0;
+  const filamentoUsado = impressoes.reduce((s,i) => s + i.consumo, 0);
+  const qtdVendas      = vendas.reduce((s,v) => s + v.qtd, 0);
+  const ticketMedio    = vendas.length > 0 ? receitaBruta / vendas.length : 0;
+
+  return { receitaBruta, custoProd, lucroBruto, margemBruta, gastosOp, gastosCat, lucroReal, margemReal, filamentoUsado, qtdVendas, ticketMedio, totalVendas: vendas.length };
+}
+
+function dreAnoCompleto() {
+  _dreAnoCompleto = !_dreAnoCompleto;
+  renderDRE();
+}
+
+function renderDRE() {
+  if (!state.gastos) state.gastos = [];
+  const mes = Number(document.getElementById('dre-mes').value);
+  const ano = Number(document.getElementById('dre-ano').value);
+  const d = calcularDREPeriodo(mes, ano, _dreAnoCompleto);
+
+  // Titulo
+  const titulo = _dreAnoCompleto ? `DRE — Ano ${ano}` : `DRE — ${mesesNomes[mes]} ${ano}`;
+  document.getElementById('dre-titulo').textContent = titulo;
+
+  // Cards
+  document.getElementById('dre-cards').innerHTML = `
+    <div class="card green">
+      <div class="card-label">Receita Bruta</div>
+      <div class="card-value">${fmt(d.receitaBruta)}</div>
+      <div class="card-sub">${d.totalVendas} venda(s) · ${d.qtdVendas} peça(s)</div>
+    </div>
+    <div class="card orange">
+      <div class="card-label">Lucro Bruto</div>
+      <div class="card-value">${fmt(d.lucroBruto)}</div>
+      <div class="card-sub">Margem bruta: ${d.margemBruta.toFixed(1)}%</div>
+    </div>
+    <div class="card red">
+      <div class="card-label">Gastos Operacionais</div>
+      <div class="card-value">${fmt(d.gastosOp)}</div>
+      <div class="card-sub">Infraestrutura e custos fixos</div>
+    </div>
+    <div class="card ${d.lucroReal >= 0 ? 'purple' : 'red'}">
+      <div class="card-label">Lucro Real (EBIT)</div>
+      <div class="card-value ${d.lucroReal >= 0 ? 'profit-positive' : 'profit-negative'}">${fmt(d.lucroReal)}</div>
+      <div class="card-sub">Margem real: ${d.margemReal.toFixed(1)}%</div>
+    </div>
+  `;
+
+  // Tabela DRE
+  const dreLinhas = [
+    { label: '(+) RECEITA BRUTA DE VENDAS', valor: d.receitaBruta, tipo: 'titulo' },
+    { label: 'Vendas de peças/produtos', valor: d.receitaBruta, tipo: 'sub' },
+    { label: '(−) CUSTO DE PRODUÇÃO', valor: -d.custoProd, tipo: 'titulo' },
+    { label: 'Material / filamento', valor: -d.custoProd, tipo: 'sub' },
+    { label: '= LUCRO BRUTO', valor: d.lucroBruto, tipo: 'resultado', pct: d.margemBruta },
+    { label: '(−) GASTOS OPERACIONAIS', valor: -d.gastosOp, tipo: 'titulo' },
+    ...Object.entries(d.gastosCat).map(([cat, val]) => ({
+      label: '· ' + (catInfo[cat]?.label || cat), valor: -val, tipo: 'sub'
+    })),
+    { label: '= LUCRO REAL (EBIT)', valor: d.lucroReal, tipo: 'resultado-final', pct: d.margemReal },
+  ];
+
+  document.getElementById('dre-tabela').innerHTML = dreLinhas.map(l => {
+    const cor = l.valor >= 0 ? '#C8830A' : 'var(--danger)';
+    if (l.tipo === 'titulo') return `
+      <div style="display:flex;justify-content:space-between;padding:10px 0 4px;border-top:1px solid rgba(200,131,10,0.15);margin-top:8px;font-size:0.78rem;font-weight:700;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.8px;">
+        <span>${l.label}</span>
+        <span style="font-family:'JetBrains Mono',monospace;color:${cor}">${l.valor >= 0 ? fmt(l.valor) : '− '+fmt(Math.abs(l.valor))}</span>
+      </div>`;
+    if (l.tipo === 'sub') return `
+      <div style="display:flex;justify-content:space-between;padding:5px 0 5px 12px;font-size:0.84rem;color:rgba(255,255,255,0.45);">
+        <span>${l.label}</span>
+        <span style="font-family:'JetBrains Mono',monospace;color:${cor}">${l.valor >= 0 ? fmt(l.valor) : '− '+fmt(Math.abs(l.valor))}</span>
+      </div>`;
+    if (l.tipo === 'resultado') return `
+      <div style="display:flex;justify-content:space-between;padding:12px 0;border-top:2px solid rgba(200,131,10,0.2);border-bottom:1px solid rgba(200,131,10,0.15);margin-top:4px;font-weight:700;">
+        <span>${l.label}</span>
+        <div style="text-align:right">
+          <div style="font-family:'JetBrains Mono',monospace;color:${cor};font-size:1rem">${fmt(l.valor)}</div>
+          <div style="font-size:0.75rem;color:rgba(255,255,255,0.45)">${l.pct?.toFixed(1)}% margem</div>
+        </div>
+      </div>`;
+    if (l.tipo === 'resultado-final') return `
+      <div style="display:flex;justify-content:space-between;padding:14px;background:${l.valor>=0?'rgba(200,131,10,0.1)':'rgba(255,77,109,0.08)'};border:1px solid ${l.valor>=0?'rgba(200,131,10,0.4)':'rgba(255,77,109,0.3)'};border-radius:8px;margin-top:12px;font-weight:800;">
+        <span style="font-size:0.95rem">${l.label}</span>
+        <div style="text-align:right">
+          <div style="font-family:'JetBrains Mono',monospace;color:${cor};font-size:1.2rem">${fmt(l.valor)}</div>
+          <div style="font-size:0.75rem;color:rgba(255,255,255,0.45)">${l.pct?.toFixed(1)}% margem</div>
+        </div>
+      </div>`;
+    return '';
+  }).join('');
+
+  // Extras
+  document.getElementById('dre-tabela').innerHTML += `
+    <div style="margin-top:16px;padding:12px;background:rgba(255,255,255,0.06);border-radius:8px;font-size:0.82rem;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div><span style="color:rgba(255,255,255,0.45)">Ticket médio:</span> <strong>${fmt(d.ticketMedio)}</strong></div>
+      <div><span style="color:rgba(255,255,255,0.45)">Filamento usado:</span> <strong>${d.filamentoUsado.toFixed(0)}g</strong></div>
+    </div>`;
+
+  // Evolução 6 meses
+  const evolucao = [];
+  for (let i = 5; i >= 0; i--) {
+    const d2 = new Date(ano, mes - i, 1);
+    const r = calcularDREPeriodo(d2.getMonth(), d2.getFullYear());
+    evolucao.push({ label: mesesNomes[d2.getMonth()].substring(0,3) + '/' + String(d2.getFullYear()).slice(2), ...r });
+  }
+  const maxVal = Math.max(...evolucao.map(e => e.receitaBruta), 1);
+  document.getElementById('dre-evolucao').innerHTML = evolucao.map(e => {
+    const pctR = (e.receitaBruta / maxVal * 100).toFixed(0);
+    const pctL = (Math.max(0, e.lucroReal) / maxVal * 100).toFixed(0);
+    return `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <span style="font-size:0.78rem;color:rgba(255,255,255,0.45);font-family:'JetBrains Mono',monospace;width:52px;flex-shrink:0">${e.label}</span>
+        <div style="flex:1;">
+          <div style="height:10px;background:rgba(255,255,255,0.1);border-radius:99px;overflow:hidden;margin-bottom:3px;">
+            <div style="height:100%;width:${pctR}%;background:#C8830A;border-radius:99px;"></div>
+          </div>
+          <div style="height:10px;background:rgba(255,255,255,0.1);border-radius:99px;overflow:hidden;">
+            <div style="height:100%;width:${pctL}%;background:${e.lucroReal>=0?'#e6a020':'var(--danger)'};border-radius:99px;"></div>
+          </div>
+        </div>
+        <div style="text-align:right;width:80px;flex-shrink:0">
+          <div style="font-size:0.75rem;font-family:'JetBrains Mono',monospace;color:#C8830A">${fmt(e.receitaBruta)}</div>
+          <div style="font-size:0.75rem;font-family:'JetBrains Mono',monospace;color:${e.lucroReal>=0?'#e6a020':'var(--danger)'}">${fmt(e.lucroReal)}</div>
+        </div>
+      </div>`;
+  }).join('') + `<div style="display:flex;gap:16px;margin-top:8px;font-size:0.75rem;color:rgba(255,255,255,0.45);">
+    <span><span style="display:inline-block;width:10px;height:10px;background:#C8830A;border-radius:2px;margin-right:4px;"></span>Receita</span>
+    <span><span style="display:inline-block;width:10px;height:10px;background:#e6a020;border-radius:2px;margin-right:4px;"></span>Lucro Real</span>
+  </div>`;
+
+  // Comparativo anual
+  const tbody = document.getElementById('dre-comparativo');
+  const anoSel = Number(document.getElementById('dre-ano').value);
+  const linhas = mesesNomes.map((nome, mi) => {
+    const r = calcularDREPeriodo(mi, anoSel);
+    if (r.receitaBruta === 0 && r.gastosOp === 0) return null;
+    const cls = r.lucroReal >= 0 ? 'profit-positive' : 'profit-negative';
+    return `<tr>
+      <td><strong>${nome.substring(0,3)}</strong></td>
+      <td style="font-family:'JetBrains Mono',monospace;color:#C8830A">${fmt(r.receitaBruta)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;color:var(--danger)">− ${fmt(r.custoProd)}</td>
+      <td style="font-family:'JetBrains Mono',monospace">${fmt(r.lucroBruto)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;color:var(--danger)">− ${fmt(r.gastosOp)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-weight:700" class="${cls}">${fmt(r.lucroReal)}</td>
+      <td><span class="badge ${r.margemReal>=0?'badge-green':'badge-red'}">${r.margemReal.toFixed(1)}%</span></td>
+      <td style="text-align:center;color:rgba(255,255,255,0.45)">${r.totalVendas}</td>
+    </tr>`;
+  }).filter(Boolean);
+
+  if (linhas.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="es-icon">📊</div><p>Nenhum dado para ${anoSel}</p></div></td></tr>`;
+  } else {
+    tbody.innerHTML = linhas.join('');
+  }
+}
+
+// ============== GASTOS ==============
+let _gastoPeriodo = 'tudo';
+
+const catInfo = {
+  impressora:  { label: 'Impressora',          cor: '#C8830A' },
+  filamento:   { label: 'Filamento',            cor: '#C8830A' },
+  manutencao:  { label: 'Manutenção',           cor: '#ff4d6d' },
+  energia:     { label: 'Energia Elétrica',     cor: '#ffd166' },
+  embalagem:   { label: 'Embalagem',            cor: '#C8830A' },
+  ferramenta:  { label: 'Ferramentas',          cor: '#4cc9f0' },
+  software:    { label: 'Software/Assinatura',  cor: '#a78bfa' },
+  outro:       { label: 'Outro',                cor: 'rgba(255,255,255,0.45)' },
+};
+
+function filtrarGastosPeriodo(periodo, btn) {
+  _gastoPeriodo = periodo;
+  document.querySelectorAll('.gasto-periodo-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderGastos();
+}
+
+function gastosFiltrados() {
+  const catFiltro = document.getElementById('gasto-filtro-cat') ? document.getElementById('gasto-filtro-cat').value : '';
+  const agora = new Date();
+  return (state.gastos || []).filter(g => {
+    const d = new Date(g.data + 'T12:00:00');
+    let ok = true;
+    if (_gastoPeriodo === 'mes') ok = d.getMonth() === agora.getMonth() && d.getFullYear() === agora.getFullYear();
+    if (_gastoPeriodo === 'ano') ok = d.getFullYear() === agora.getFullYear();
+    if (catFiltro) ok = ok && g.categoria === catFiltro;
+    return ok;
+  });
+}
+
+function renderGastos() {
+  if (!state.gastos) state.gastos = [];
+  const gf = gastosFiltrados();
+  const cards = document.getElementById('gastos-cards');
+  const tbody = document.getElementById('gastos-tbody');
+  const count = document.getElementById('gastos-count');
+
+  const totalGastos = gf.reduce((s, g) => s + g.valor, 0);
+  const totalVendas = state.vendas.reduce((s, v) => s + v.valor * v.qtd, 0);
+  const totalCustos = state.vendas.reduce((s, v) => s + v.custo * v.qtd, 0);
+  const lucroReal = totalVendas - totalCustos - totalGastos;
+  const recorrentes = (state.gastos || []).filter(g => g.recorrente !== 'nao').reduce((s, g) => s + g.valor, 0);
+
+  count.textContent = gf.length + ' registros';
+
+  cards.innerHTML = `
+    <div class="card red"><div class="card-label">Total de Gastos</div><div class="card-value">${fmt(totalGastos)}</div><div class="card-sub">${gf.length} lançamentos</div></div>
+    <div class="card orange"><div class="card-label">Gastos Recorrentes</div><div class="card-value">${fmt(recorrentes)}</div><div class="card-sub">Mensais + Anuais</div></div>
+    <div class="card green"><div class="card-label">Receita Total</div><div class="card-value">${fmt(totalVendas)}</div><div class="card-sub">Todas as vendas</div></div>
+    <div class="card ${lucroReal >= 0 ? 'purple' : 'red'}"><div class="card-label">Lucro Real</div><div class="card-value ${lucroReal >= 0 ? 'profit-positive' : 'profit-negative'}">${fmt(lucroReal)}</div><div class="card-sub">Vendas − Custos − Gastos</div></div>
+  `;
+
+  // Por categoria
+  const porCat = {};
+  gf.forEach(g => { porCat[g.categoria] = (porCat[g.categoria] || 0) + g.valor; });
+  const catDiv = document.getElementById('gastos-por-categoria');
+  if (Object.keys(porCat).length === 0) {
+    catDiv.innerHTML = '<div class="empty-state"><div class="es-icon">📋</div><p>Nenhum gasto registrado</p></div>';
+  } else {
+    const max = Math.max(...Object.values(porCat));
+    catDiv.innerHTML = Object.entries(porCat).sort((a,b) => b[1]-a[1]).map(([cat, val]) => {
+      const info = catInfo[cat] || { label: cat, cor: 'rgba(255,255,255,0.45)' };
+      const pct = (val / max * 100).toFixed(0);
+      return `<div style="margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:4px;">
+          <span style="color:#ffffff;font-weight:600;">${info.label}</span>
+          <span style="font-family:'JetBrains Mono',monospace;color:rgba(255,255,255,0.45)">${fmt(val)}</span>
+        </div>
+        <div class="filament-bar"><div class="filament-bar-fill" style="width:${pct}%;background:${info.cor}"></div></div>
+      </div>`;
+    }).join('');
+  }
+
+  // Lucro real breakdown
+  const lrDiv = document.getElementById('gastos-lucro-real');
+  lrDiv.innerHTML = `
+    <div class="calc-row"><span>Receita total de vendas</span><span style="font-family:'JetBrains Mono',monospace;color:#C8830A">${fmt(totalVendas)}</span></div>
+    <div class="calc-row"><span>Custo de produção</span><span style="font-family:'JetBrains Mono',monospace;color:var(--danger)">− ${fmt(totalCustos)}</span></div>
+    <div class="calc-row"><span>Gastos operacionais</span><span style="font-family:'JetBrains Mono',monospace;color:var(--danger)">− ${fmt(totalGastos)}</span></div>
+    <div style="height:1px;background:rgba(200,131,10,0.2);margin:8px 0;"></div>
+    <div class="calc-row total"><span>Lucro Real</span><span style="font-family:'JetBrains Mono',monospace;font-size:1.1rem;" class="${lucroReal >= 0 ? 'profit-positive' : 'profit-negative'}">${fmt(lucroReal)}</span></div>
+    <div style="margin-top:12px;font-size:0.78rem;color:rgba(255,255,255,0.45)">Este é o lucro real considerando TODOS os seus gastos operacionais.</div>
+  `;
+
+  // Tabela
+  const recMap = { nao: '—', mensal: '<span class="badge badge-orange">Mensal</span>', anual: '<span class="badge badge-purple">Anual</span>' };
+  if (!gf.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="es-icon">💸</div><p>Nenhum gasto registrado neste período</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = [...gf].reverse().map((g, idx) => {
+    const info = catInfo[g.categoria] || { label: g.categoria, cor: 'rgba(255,255,255,0.45)' };
+    const dt = new Date(g.data + 'T12:00:00').toLocaleDateString('pt-BR');
+    const realIdx = state.gastos.length - 1 - state.gastos.slice().reverse().findIndex(x => x === g);
+    return `<tr>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:0.8rem">${dt}</td>
+      <td><strong>${g.desc}</strong></td>
+      <td><span class="badge" style="background:${info.cor}22;color:${info.cor}">${info.label}</span></td>
+      <td style="font-family:'JetBrains Mono',monospace;color:var(--danger);font-weight:700">${fmt(g.valor)}</td>
+      <td>${recMap[g.recorrente] || '—'}</td>
+      <td style="font-size:0.8rem;color:rgba(255,255,255,0.45)">${g.notas || '—'}</td>
+      <td>
+        <div class="btn-row">
+          <button class="btn btn-ghost btn-sm" onclick="editGasto(${realIdx})">✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="delGasto(${realIdx})">🗑️</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function salvarGasto() {
+  if (!state.gastos) state.gastos = [];
+  const idxStr = document.getElementById('gasto-edit-idx').value;
+  const obj = {
+    id: genId(),
+    desc: document.getElementById('gasto-desc').value || 'Gasto',
+    categoria: document.getElementById('gasto-cat').value,
+    valor: Number(document.getElementById('gasto-valor').value) || 0,
+    data: document.getElementById('gasto-data').value || new Date().toISOString().split('T')[0],
+    recorrente: document.getElementById('gasto-recorrente').value,
+    notas: document.getElementById('gasto-notas').value,
+  };
+  if (idxStr !== '') {
+    const idx = Number(idxStr);
+    obj.id = state.gastos[idx].id;
+    state.gastos[idx] = obj;
+  } else {
+    state.gastos.push(obj);
+  }
+  saveState();
+  closeModal('modal-gasto');
+  renderGastos();
+}
+
+function editGasto(idx) {
+  if (!state.gastos) return;
+  const g = state.gastos[idx];
+  if (!g) return;
+  document.getElementById('modal-gasto-title').textContent = 'Editar Gasto';
+  document.getElementById('gasto-edit-idx').value = idx;
+  document.getElementById('gasto-desc').value = g.desc;
+  document.getElementById('gasto-cat').value = g.categoria;
+  document.getElementById('gasto-valor').value = g.valor;
+  document.getElementById('gasto-data').value = g.data;
+  document.getElementById('gasto-recorrente').value = g.recorrente;
+  document.getElementById('gasto-notas').value = g.notas || '';
+  openModal('modal-gasto');
+}
+
+function delGasto(idx) {
+  confirmar('Deseja realmente excluir este gasto?', function() {
+    state.gastos.splice(idx, 1);
+    saveState();
+    renderGastos();
+  });
+}
+
+function gerarItensHTML(itens) {
+  const hexMap = {'Branco':'#ffffff','Preto':'#1a1a1a','Vermelho':'#e53935','Azul':'#1e88e5','Verde':'#43a047','Amarelo':'#fdd835','Laranja':'#fb8c00','Rosa':'#e91e8c','Roxo':'#8e24aa','Cinza':'#757575','Transparente':'#e0e0e0','Prata':'#b0bec5','Dourado':'#f9a825'};
+  return itens.map((it, i) => {
+    const coresHTML = it.cores && it.cores.length
+      ? `<div style="margin-top:5px;display:flex;gap:4px;flex-wrap:wrap;">${it.cores.map(cor => {
+          const hex = hexMap[cor] || '#C8830A';
+          const txt = ['Branco','Transparente','Amarelo','Prata'].includes(cor) ? '#333' : '#fff';
+          return `<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:0.68rem;font-weight:600;background:${hex};color:${txt};border:1px solid rgba(0,0,0,0.12);">
+            <span style="width:7px;height:7px;border-radius:50%;background:${hex};border:1px solid rgba(0,0,0,0.2);display:inline-block;"></span>${cor}</span>`;
+        }).join('')}</div>` : '';
+    return `<tr style="background:${i%2===0?'#ffffff':'#fdf8f3'};">
+      <td style="padding:12px 16px;font-size:0.9rem;color:#321C05;border-bottom:1px solid #f0ebe4;font-family:'Cormorant Garamond',serif;font-weight:500;">${it.desc}${coresHTML}</td>
+      <td style="padding:12px 16px;font-size:0.9rem;text-align:center;color:#6b4c2a;border-bottom:1px solid #f0ebe4;">${it.qtd}</td>
+      <td style="padding:12px 16px;font-size:0.9rem;text-align:right;color:#6b4c2a;border-bottom:1px solid #f0ebe4;">R$ ${it.valor.toFixed(2).replace('.',',')}</td>
+      <td style="padding:12px 16px;font-size:0.9rem;text-align:right;font-weight:700;color:#321C05;border-bottom:1px solid #f0ebe4;">R$ ${(it.qtd*it.valor).toFixed(2).replace('.',',')}</td>
+    </tr>`;
+  }).join('');
+}
+
+function imprimirOrcamento() {
+  const idx = Number(document.getElementById('orc-preview-idx').value);
+  const o = state.orcamentos[idx];
+  const agora = new Date().toLocaleDateString('pt-BR');
+  const val = new Date(o.validade+'T12:00:00').toLocaleDateString('pt-BR');
+  const stLabel = { pendente:'PENDENTE', aprovado:'APROVADO', recusado:'RECUSADO' };
+  const stCor   = { pendente:'#f97316', aprovado:'#16a34a', recusado:'#dc2626' };
+
+  const itensHTML = gerarItensHTML(o.itens);
+
+  const html = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Orçamento #${o.numero} — EXTREME3D</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Great+Vibes&family=Inter:wght@400;500;600;700;800&family=Raleway:wght@100;200;300;400&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Inter',Arial,sans-serif;background:#f5ede3;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .page{max-width:720px;margin:30px auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 8px 32px rgba(50,28,5,0.18);display:flex;flex-direction:column;min-height:297mm;}
+  @media print{body{background:#fff;}.page{box-shadow:none;border-radius:0;margin:0;max-width:100%;min-height:100vh;}}
+  @page{margin:0;size:A4;}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div style="background:#321C05;padding:0;position:relative;overflow:hidden;">
+    <div style="position:absolute;top:0;right:0;width:220px;height:100%;background:#C8830A;clip-path:polygon(30% 0,100% 0,100% 100%,0% 100%);opacity:0.9;"></div>
+    <div style="position:relative;z-index:1;padding:30px 32px;display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <div style="font-family:'Raleway',sans-serif;font-size:1.4rem;font-weight:200;letter-spacing:0.45em;text-indent:0.45em;color:#fff;line-height:1;font-variant-numeric:normal;font-feature-settings:'lnum' 1;">EXTREME&nbsp;3D</div>
+        <div style="color:#C8830A;font-size:1rem;margin-top:5px;font-family:'Great Vibes',cursive;padding-left:0.45em;">você imagina. a gente imprime.</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:0.7rem;color:#aaa;text-transform:uppercase;letter-spacing:2px;margin-bottom:4px;">Orçamento</div>
+        <div style="font-size:2rem;font-weight:900;color:#fff;line-height:1;">#${o.numero}</div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div style="background:#3d2005;padding:16px 32px;display:flex;gap:32px;">
+    <div><div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:1.5px;color:#888;margin-bottom:3px;">Emissão</div><div style="font-size:0.88rem;font-weight:600;color:#fff;">${agora}</div></div>
+    <div><div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:1.5px;color:#888;margin-bottom:3px;">Válido até</div><div style="font-size:0.88rem;font-weight:600;color:#fff;">${val}</div></div>
+    ${o.prazo?`<div><div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:1.5px;color:#888;margin-bottom:3px;">Prazo de Entrega</div><div style="font-size:0.88rem;font-weight:600;color:#fff;">${o.prazo}</div></div>`:''}
+  </div>
+
+  <div style="padding:24px 32px;border-bottom:1px solid #f0f0f0;">
+    <div>
+      <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:1.5px;color:#999;margin-bottom:6px;">Para</div>
+      <div style="font-size:1.1rem;font-weight:800;color:#1a1a1a;">${o.cliente}</div>
+      ${o.telefone?`<div style="font-size:0.85rem;color:#666;margin-top:3px;">📱 ${o.telefone}</div>`:''}
+    </div>
+
+  </div>
+
+  <div style="padding:24px 32px 0;">
+    <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:1.5px;color:#999;margin-bottom:12px;">Itens do Orçamento</div>
+    <table style="width:100%;border-collapse:collapse;border-radius:8px;overflow:hidden;border:1px solid #f0f0f0;">
+      <thead>
+        <tr style="background:#321C05;">
+          <th style="padding:11px 16px;text-align:left;font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:#fff;font-weight:600;">Descrição</th>
+          <th style="padding:11px 16px;text-align:center;font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:#fff;font-weight:600;">Qtd</th>
+          <th style="padding:11px 16px;text-align:right;font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:#fff;font-weight:600;">Unit.</th>
+          <th style="padding:11px 16px;text-align:right;font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:#fff;font-weight:600;">Total</th>
+        </tr>
+      </thead>
+      <tbody>${itensHTML}</tbody>
+    </table>
+  </div>
+
+  <div style="padding:20px 32px;display:flex;justify-content:flex-end;">
+    <div style="min-width:240px;">
+      <div style="display:flex;justify-content:space-between;padding:7px 0;font-size:0.88rem;color:#666;border-bottom:1px solid #f0f0f0;"><span>Subtotal</span><span>R$ ${o.subtotal.toFixed(2).replace('.',',')}</span></div>
+      ${o.desconto>0?`<div style="display:flex;justify-content:space-between;padding:7px 0;font-size:0.88rem;color:#dc2626;border-bottom:1px solid #f0f0f0;"><span>Desconto</span><span>− R$ ${o.desconto.toFixed(2).replace('.',',')}</span></div>`:''}
+      <div style="display:flex;justify-content:space-between;padding:12px 0 4px;font-size:1.1rem;font-weight:900;"><span>TOTAL</span><span style="color:#C8830A;">R$ ${o.total.toFixed(2).replace('.',',')}</span></div>
+    </div>
+  </div>
+
+  ${o.obs?`<div style="margin:0 32px 24px;background:#fffbf5;border-left:4px solid #C8830A;padding:14px 18px;border-radius:0 8px 8px 0;">
+    <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:1.5px;color:#C8830A;margin-bottom:6px;font-weight:700;">Observações</div>
+    <div style="font-size:0.85rem;color:#555;line-height:1.6;">${o.obs}</div>
+  </div>`:''}
+
+  <div style="flex:1;"></div>
+
+  <div style="background:#321C05;padding:18px 32px;display:flex;justify-content:space-between;align-items:center;">
+    <div>
+      <div style="font-family:'Raleway',sans-serif;font-size:0.78rem;font-weight:200;letter-spacing:0.4em;text-indent:0.4em;color:#fff;line-height:1;font-variant-numeric:normal;font-feature-settings:'lnum' 1;">EXTREME&nbsp;3D</div>
+      <div style="font-size:0.8rem;color:#C8830A;margin-top:3px;font-family:'Great Vibes',cursive;padding-left:0.4em;">você imagina. a gente imprime.</div>
+    </div>
+    <div style="text-align:right;font-size:0.72rem;color:#666;">
+      <div>Orçamento gerado em ${agora}</div>
+      <div style="margin-top:2px;">Válido até ${val}</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>`;
+
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const a = document.createElement('a');
+    a.href = e.target.result;
+    a.download = `Orcamento-${o.numero}-${o.cliente.replace(/\s+/g,'-')}.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+  reader.readAsDataURL(blob);
+  alert('✅ Arquivo baixado!\n\nAbra o arquivo no seu navegador e use Ctrl+P para imprimir ou salvar como PDF.');
+}
+
+// ============== ABAS VENDAS ==============
+function abrirAbaVendas(aba) {
+  document.getElementById('aba-historico').style.display = aba === 'historico' ? 'block' : 'none';
+  document.getElementById('aba-orcamentos').style.display = aba === 'orcamentos' ? 'block' : 'none';
+  document.getElementById('tab-vendas-hist').classList.toggle('active', aba === 'historico');
+  document.getElementById('tab-vendas-orc').classList.toggle('active', aba === 'orcamentos');
+  if (aba === 'orcamentos') renderOrcamentos();
+}
+
+// ============== ORÇAMENTOS ==============
+let _orcItens = [];
+
+function abrirModalOrcamento() {
+  _orcItens = [];
+  document.getElementById('orc-itens').innerHTML = '';
+  adicionarItemOrc();
+  const d = new Date(); d.setDate(d.getDate() + 7);
+  document.getElementById('orc-validade').value = d.toISOString().split('T')[0];
+  calcOrcamento();
+}
+
+function adicionarItemOrc() {
+  const idx = _orcItens.length;
+  _orcItens.push({ desc: '', qtd: 1, valor: 0, cores: [] });
+  const div = document.createElement('div');
+  div.id = `orc-item-${idx}`;
+  div.style.cssText = 'background:rgba(255,255,255,0.06);border:1px solid rgba(200,131,10,0.2);border-radius:8px;padding:10px 12px;margin-bottom:10px;';
+
+  const coresDisponiveis = state.filamentos.map(f => f.cor).filter(Boolean);
+  const coresExtras = ['Branco','Preto','Vermelho','Azul','Verde','Amarelo','Laranja','Rosa','Roxo','Cinza','Transparente','Prata','Dourado'];
+  const todasCores = [...new Set([...coresDisponiveis, ...coresExtras])];
+
+  div.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 60px 110px 32px;gap:8px;margin-bottom:8px;align-items:center;">
+      <input type="text" placeholder="Descrição do item" oninput="_orcItens[${idx}].desc=this.value"
+        style="padding:8px 10px;background:#321C05;border:1px solid rgba(200,131,10,0.2);border-radius:7px;color:#ffffff;font-family:'Inter',sans-serif;font-size:0.85rem;">
+      <input type="number" placeholder="Qtd" value="1" min="1" oninput="_orcItens[${idx}].qtd=Number(this.value)||1;calcOrcamento()"
+        style="padding:8px 6px;background:#321C05;border:1px solid rgba(200,131,10,0.2);border-radius:7px;color:#ffffff;font-family:'JetBrains Mono',monospace;font-size:0.85rem;text-align:center;">
+      <input type="number" placeholder="R$ 0,00" min="0" step="0.01" oninput="_orcItens[${idx}].valor=Number(this.value)||0;calcOrcamento()"
+        style="padding:8px 8px;background:#321C05;border:1px solid rgba(200,131,10,0.2);border-radius:7px;color:#ffffff;font-family:'JetBrains Mono',monospace;font-size:0.85rem;">
+      <button onclick="removerItemOrc(${idx})" style="padding:6px;background:rgba(255,77,109,0.15);border:1px solid rgba(255,77,109,0.4);border-radius:7px;color:var(--danger);cursor:pointer;font-size:0.85rem;">✕</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <span style="font-size:0.7rem;color:rgba(255,255,255,0.45);font-weight:600;text-transform:uppercase;letter-spacing:0.7px;white-space:nowrap;">🎨 Cor(es):</span>
+      <div id="cores-selecionadas-${idx}" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+      <select onchange="adicionarCorItem(${idx}, this)" style="padding:4px 8px;background:#321C05;border:1px solid rgba(200,131,10,0.2);border-radius:6px;color:#ffffff;font-family:'Inter',sans-serif;font-size:0.78rem;cursor:pointer;">
+        <option value="">+ Adicionar cor</option>
+        ${todasCores.map(c => `<option value="${c}">${c}</option>`).join('')}
+        <option value="__custom">✏️ Digitar cor...</option>
+      </select>
+    </div>`;
+  document.getElementById('orc-itens').appendChild(div);
+}
+
+function adicionarCorItem(idx, select) {
+  let cor = select.value;
+  if (!cor) return;
+  if (cor === '__custom') {
+    cor = prompt('Digite o nome da cor:');
+    if (!cor) { select.value = ''; return; }
+  }
+  if (!_orcItens[idx]) return;
+  if (!_orcItens[idx].cores) _orcItens[idx].cores = [];
+  if (_orcItens[idx].cores.includes(cor)) { select.value = ''; return; }
+  _orcItens[idx].cores.push(cor);
+  renderCoresItem(idx);
+  select.value = '';
+}
+
+function removerCorItem(idx, cor) {
+  if (!_orcItens[idx]) return;
+  _orcItens[idx].cores = _orcItens[idx].cores.filter(c => c !== cor);
+  renderCoresItem(idx);
+}
+
+// Mapa de cores para exibição visual
+const corHexMap = {
+  'Branco':'#ffffff','Preto':'#1a1a1a','Vermelho':'#e53935','Azul':'#1e88e5',
+  'Verde':'#43a047','Amarelo':'#fdd835','Laranja':'#fb8c00','Rosa':'#e91e8c',
+  'Roxo':'#8e24aa','Cinza':'#757575','Transparente':'#e0e0e0','Prata':'#b0bec5',
+  'Dourado':'#f9a825'
+};
+
+function renderCoresItem(idx) {
+  const el = document.getElementById(`cores-selecionadas-${idx}`);
+  if (!el || !_orcItens[idx]) return;
+  el.innerHTML = (_orcItens[idx].cores || []).map(cor => {
+    const hex = corHexMap[cor] || '#C8830A';
+    const textColor = ['Branco','Transparente','Amarelo','Prata'].includes(cor) ? '#333' : '#fff';
+    return `<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:0.72rem;font-weight:600;background:${hex};color:${textColor};border:1px solid rgba(0,0,0,0.15);cursor:default;">
+      <span style="width:8px;height:8px;border-radius:50%;background:${hex};border:1px solid rgba(0,0,0,0.2);display:inline-block;"></span>
+      ${cor}
+      <span onclick="removerCorItem(${idx},'${cor}')" style="cursor:pointer;margin-left:2px;opacity:0.7;font-size:0.75rem;">✕</span>
+    </span>`;
+  }).join('');
+}
+
+function removerItemOrc(idx) {
+  _orcItens[idx] = null;
+  const el = document.getElementById(`orc-item-${idx}`);
+  if (el) el.remove();
+  calcOrcamento();
+}
+
+function calcOrcamento() {
+  const itens = _orcItens.filter(Boolean);
+  const sub = itens.reduce((s, i) => s + (i.qtd * i.valor), 0);
+  const desc = Number(document.getElementById('orc-desconto')?.value) || 0;
+  document.getElementById('orc-subtotal').textContent = fmt(sub);
+  document.getElementById('orc-total').textContent = fmt(Math.max(0, sub - desc));
+}
+
+function salvarOrcamento(status = 'pendente') {
+  if (!state.orcamentos) state.orcamentos = [];
+  const idxStr = document.getElementById('orc-edit-idx').value;
+  const itens = _orcItens.filter(i => i && i.desc);
+  const desconto = Number(document.getElementById('orc-desconto').value) || 0;
+  const sub = itens.reduce((s,i) => s + i.qtd*i.valor, 0);
+
+  const obj = {
+    id: genId(),
+    numero: (state.orcamentos.length + 1).toString().padStart(4, '0'),
+    cliente: document.getElementById('orc-cliente').value || 'Cliente',
+    telefone: document.getElementById('orc-telefone').value,
+    validade: document.getElementById('orc-validade').value,
+    prazo: document.getElementById('orc-prazo').value,
+    itens, desconto, subtotal: sub,
+    total: Math.max(0, sub - desconto),
+    obs: document.getElementById('orc-obs').value,
+    status, data: new Date().toISOString().split('T')[0],
+  };
+
+  if (idxStr !== '') {
+    obj.id = state.orcamentos[Number(idxStr)].id;
+    obj.numero = state.orcamentos[Number(idxStr)].numero;
+    state.orcamentos[Number(idxStr)] = obj;
+  } else {
+    state.orcamentos.push(obj);
+  }
+  saveState();
+  closeModal('modal-orcamento');
+  abrirAbaVendas('orcamentos');
+}
+
+function renderOrcamentos() {
+  if (!state.orcamentos) state.orcamentos = [];
+  const total = state.orcamentos.reduce((s,o) => s + o.total, 0);
+  const aprovados = state.orcamentos.filter(o => o.status === 'aprovado');
+  const pendentes = state.orcamentos.filter(o => o.status === 'pendente');
+  const taxaConv = state.orcamentos.length > 0 ? (aprovados.length / state.orcamentos.length * 100).toFixed(0) : 0;
+
+  document.getElementById('orc-cards').innerHTML = `
+    <div class="card purple"><div class="card-label">Total Orçamentos</div><div class="card-value">${state.orcamentos.length}</div><div class="card-sub">${pendentes.length} aguardando resposta</div></div>
+    <div class="card green"><div class="card-label">Aprovados</div><div class="card-value">${aprovados.length}</div><div class="card-sub">${fmt(aprovados.reduce((s,o)=>s+o.total,0))} em vendas</div></div>
+    <div class="card orange"><div class="card-label">Taxa de Conversão</div><div class="card-value">${taxaConv}%</div><div class="card-sub">Orçamentos → Vendas</div></div>
+    <div class="card green"><div class="card-label">Valor Total</div><div class="card-value">${fmt(total)}</div><div class="card-sub">Todos os orçamentos</div></div>
+  `;
+
+  const stBadge = { pendente:'badge-orange', aprovado:'badge-green', recusado:'badge-red' };
+  const stLabel = { pendente:'Pendente', aprovado:'Aprovado', recusado:'Recusado' };
+
+  if (!state.orcamentos.length) {
+    document.getElementById('orc-lista').innerHTML = '<div class="empty-state"><div class="es-icon">📄</div><p>Nenhum orçamento criado ainda</p></div>';
+    return;
+  }
+
+  document.getElementById('orc-lista').innerHTML = [...state.orcamentos].reverse().map((o, i) => {
+    const realIdx = state.orcamentos.length - 1 - i;
+    const dt = new Date(o.data+'T12:00:00').toLocaleDateString('pt-BR');
+    const val = new Date(o.validade+'T12:00:00').toLocaleDateString('pt-BR');
+    return `<div class="orc-card ${o.status}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:0.72rem;font-family:'JetBrains Mono',monospace;color:rgba(255,255,255,0.45)">#${o.numero}</span>
+            <span class="badge ${stBadge[o.status]}">${stLabel[o.status]}</span>
+          </div>
+          <div style="font-size:1rem;font-weight:700;margin-top:4px;">${o.cliente}</div>
+          ${o.telefone ? `<div style="font-size:0.8rem;color:rgba(255,255,255,0.45)">${o.telefone}</div>` : ''}
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:1.3rem;font-weight:800;font-family:'JetBrains Mono',monospace;color:#C8830A">${fmt(o.total)}</div>
+          <div style="font-size:0.75rem;color:rgba(255,255,255,0.45)">Criado: ${dt} · Válido até: ${val}</div>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,0.06);border-radius:8px;padding:10px 12px;margin-bottom:12px;">
+        ${o.itens.map(it => `<div style="display:flex;justify-content:space-between;font-size:0.82rem;padding:3px 0;">
+          <span style="color:rgba(255,255,255,0.45)">${it.qtd}x ${it.desc}</span>
+          <span style="font-family:'JetBrains Mono',monospace">${fmt(it.qtd*it.valor)}</span>
+        </div>`).join('')}
+        ${o.desconto > 0 ? `<div style="display:flex;justify-content:space-between;font-size:0.82rem;padding:3px 0;color:var(--danger)"><span>Desconto</span><span>− ${fmt(o.desconto)}</span></div>` : ''}
+      </div>
+      ${o.prazo ? `<div style="font-size:0.8rem;color:rgba(255,255,255,0.45);margin-bottom:10px;">⏱️ Prazo: ${o.prazo}</div>` : ''}
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-ghost btn-sm" onclick="visualizarOrcamentoPronto(${realIdx})">👁️ Visualizar</button>
+        <button class="btn btn-ghost btn-sm" onclick="editarOrcamento(${realIdx})">✏️ Editar</button>
+        ${o.status === 'pendente' ? `<button class="btn btn-success btn-sm" onclick="mudarStatusOrc(${realIdx},'aprovado')">✅ Aprovar</button>` : ''}
+        ${o.status === 'pendente' ? `<button class="btn btn-danger btn-sm" onclick="mudarStatusOrc(${realIdx},'recusado')">❌ Recusar</button>` : ''}
+        ${o.status === 'aprovado' ? `<button class="btn btn-primary btn-sm" onclick="converterEmVenda(${realIdx})">💰 Converter em Venda</button>` : ''}
+        <button class="btn btn-danger btn-sm" onclick="delOrcamento(${realIdx})">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function mudarStatusOrc(idx, status) {
+  state.orcamentos[idx].status = status;
+  saveState();
+  renderOrcamentos();
+}
+
+function delOrcamento(idx) {
+  confirmar('Excluir este orçamento?', function() {
+    state.orcamentos.splice(idx, 1);
+    saveState();
+    renderOrcamentos();
+  });
+}
+
+function editarOrcamento(idx) {
+  const o = state.orcamentos[idx];
+  document.getElementById('orc-edit-idx').value = idx;
+  document.getElementById('orc-cliente').value = o.cliente;
+  document.getElementById('orc-telefone').value = o.telefone || '';
+  document.getElementById('orc-validade').value = o.validade;
+  document.getElementById('orc-prazo').value = o.prazo || '';
+  document.getElementById('orc-obs').value = o.obs || '';
+  document.getElementById('orc-desconto').value = o.desconto || 0;
+  _orcItens = [...o.itens];
+  document.getElementById('orc-itens').innerHTML = '';
+  o.itens.forEach((it, i) => {
+    adicionarItemOrc();
+    const wrap = document.getElementById(`orc-item-${i}`);
+    const inputs = wrap.querySelectorAll('input');
+    inputs[0].value = it.desc; inputs[1].value = it.qtd; inputs[2].value = it.valor;
+    if (it.cores && it.cores.length) {
+      _orcItens[i].cores = [...it.cores];
+      renderCoresItem(i);
+    }
+  });
+  calcOrcamento();
+  document.getElementById('modal-orc-title').textContent = '✏️ Editar Orçamento';
+  openModal('modal-orcamento');
+}
+
+function converterEmVenda(idx) {
+  const o = state.orcamentos[idx];
+  confirmar(`Converter orçamento de ${o.cliente} em venda?`, function() {
+    const venda = {
+      id: genId(), nome: o.itens.map(i=>i.desc).join(', ') || 'Orçamento '+o.numero,
+      qtd: 1, custo: 0, valor: o.total,
+      data: new Date().toISOString().split('T')[0],
+      cliente: o.cliente, pagamento: 'pix', status: 'entregue',
+    };
+    state.vendas.push(venda);
+    state.orcamentos[idx].status = 'aprovado';
+    saveState();
+    renderOrcamentos();
+    alert('✅ Convertido em venda com sucesso!');
+  });
+}
+
+function visualizarOrcamento() { salvarOrcamento('pendente'); const idx = state.orcamentos.length-1; visualizarOrcamentoPronto(idx); }
+
+function visualizarOrcamentoPronto(idx) {
+  const o = state.orcamentos[idx];
+  const agora = new Date().toLocaleDateString('pt-BR');
+  const val = new Date(o.validade+'T12:00:00').toLocaleDateString('pt-BR');
+  const stLabel = { pendente:'PENDENTE', aprovado:'APROVADO', recusado:'RECUSADO' };
+  const stCor   = { pendente:'#f97316', aprovado:'#16a34a', recusado:'#dc2626' };
+
+  const itensHTML = gerarItensHTML(o.itens);
+
+  const conteudo = `
+  <div style="background:#f5ede3;padding:24px;min-height:100%;">
+    <div style="max-width:680px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.12);display:flex;flex-direction:column;min-height:700px;">
+
+      <!-- CABEÇALHO -->
+      <div style="background:#321C05;padding:0;position:relative;overflow:hidden;">
+        <div style="position:absolute;top:0;right:0;width:220px;height:100%;background:#C8830A;clip-path:polygon(30% 0,100% 0,100% 100%,0% 100%);opacity:0.9;"></div>
+        <div style="position:relative;z-index:1;padding:30px 32px;display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-family:'Raleway',sans-serif;font-size:1.4rem;font-weight:200;letter-spacing:0.45em;text-indent:0.45em;color:#fff;line-height:1;font-variant-numeric:normal;font-feature-settings:'lnum' 1;">EXTREME&nbsp;3D</div>
+            <div style="color:#C8830A;font-size:1rem;margin-top:5px;font-family:'Great Vibes',cursive;padding-left:0.45em;">você imagina. a gente imprime.</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:0.7rem;color:#aaa;text-transform:uppercase;letter-spacing:2px;margin-bottom:4px;">Orçamento</div>
+            <div style="font-size:2rem;font-weight:900;color:#fff;line-height:1;">#${o.numero}</div>
+            
+          </div>
+        </div>
+      </div>
+
+      <!-- FAIXA DE INFO -->
+      <div style="background:#3d2005;padding:16px 32px;display:flex;gap:32px;">
+        <div>
+          <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:1.5px;color:#888;margin-bottom:3px;">Emissão</div>
+          <div style="font-size:0.88rem;font-weight:600;color:#fff;">${agora}</div>
+        </div>
+        <div>
+          <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:1.5px;color:#888;margin-bottom:3px;">Válido até</div>
+          <div style="font-size:0.88rem;font-weight:600;color:#fff;">${val}</div>
+        </div>
+        ${o.prazo?`<div>
+          <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:1.5px;color:#888;margin-bottom:3px;">Prazo de Entrega</div>
+          <div style="font-size:0.88rem;font-weight:600;color:#fff;">${o.prazo}</div>
+        </div>`:''}
+      </div>
+
+      <!-- CLIENTE -->
+      <div style="padding:24px 32px;border-bottom:1px solid #f0f0f0;">
+        <div>
+          <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:1.5px;color:#999;margin-bottom:6px;">Para</div>
+          <div style="font-size:1.1rem;font-weight:800;color:#1a1a1a;">${o.cliente}</div>
+          ${o.telefone?`<div style="font-size:0.85rem;color:#666;margin-top:3px;">📱 ${o.telefone}</div>`:''}
+        </div>
+        
+      </div>
+
+      <!-- TABELA DE ITENS -->
+      <div style="padding:24px 32px 0;">
+        <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:1.5px;color:#999;margin-bottom:12px;">Itens do Orçamento</div>
+        <table style="width:100%;border-collapse:collapse;border-radius:8px;overflow:hidden;border:1px solid #f0f0f0;">
+          <thead>
+            <tr style="background:#321C05;">
+              <th style="padding:11px 16px;text-align:left;font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:#fff;font-weight:600;">Descrição</th>
+              <th style="padding:11px 16px;text-align:center;font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:#fff;font-weight:600;">Qtd</th>
+              <th style="padding:11px 16px;text-align:right;font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:#fff;font-weight:600;">Unit.</th>
+              <th style="padding:11px 16px;text-align:right;font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:#fff;font-weight:600;">Total</th>
+            </tr>
+          </thead>
+          <tbody>${itensHTML}</tbody>
+        </table>
+      </div>
+
+      <!-- TOTAIS -->
+      <div style="padding:20px 32px;display:flex;justify-content:flex-end;">
+        <div style="min-width:240px;">
+          <div style="display:flex;justify-content:space-between;padding:7px 0;font-size:0.88rem;color:#666;border-bottom:1px solid #f0f0f0;">
+            <span>Subtotal</span><span>R$ ${o.subtotal.toFixed(2).replace('.',',')}</span>
+          </div>
+          ${o.desconto>0?`<div style="display:flex;justify-content:space-between;padding:7px 0;font-size:0.88rem;color:#dc2626;border-bottom:1px solid #f0f0f0;">
+            <span>Desconto</span><span>− R$ ${o.desconto.toFixed(2).replace('.',',')}</span>
+          </div>`:''}
+          <div style="display:flex;justify-content:space-between;padding:12px 0 4px;font-size:1.1rem;font-weight:900;color:#1a1a1a;">
+            <span>TOTAL</span><span style="color:#C8830A;">R$ ${o.total.toFixed(2).replace('.',',')}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- OBSERVAÇÕES -->
+      ${o.obs?`<div style="margin:0 32px 24px;background:#fffbf5;border-left:4px solid #C8830A;padding:14px 18px;border-radius:0 8px 8px 0;">
+        <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:1.5px;color:#C8830A;margin-bottom:6px;font-weight:700;">Observações</div>
+        <div style="font-size:0.85rem;color:#555;line-height:1.6;">${o.obs}</div>
+      </div>`:''}
+
+      <div style="flex:1;"></div>
+
+      <div style="background:#321C05;padding:18px 32px;display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div style="font-family:'Raleway',sans-serif;font-size:0.78rem;font-weight:200;letter-spacing:0.4em;text-indent:0.4em;color:#fff;line-height:1;font-variant-numeric:normal;font-feature-settings:'lnum' 1;">EXTREME&nbsp;3D</div>
+          <div style="font-size:0.8rem;color:#C8830A;margin-top:3px;font-family:'Great Vibes',cursive;padding-left:0.4em;">você imagina. a gente imprime.</div>
+        </div>
+        <div style="text-align:right;font-size:0.72rem;color:#666;">
+          <div>Orçamento gerado em ${agora}</div>
+          <div style="margin-top:2px;color:#555;">Este orçamento é válido até ${val}</div>
+        </div>
+      </div>
+
+    </div>
+  </div>`;
+
+  document.getElementById('orc-preview-content').innerHTML = conteudo;
+  document.getElementById('orc-preview-idx').value = idx;
+  document.getElementById('modal-orc-preview').classList.add('open');
+}
+
+// ============== PERÍODO DE VENDAS ==============
+let _periodoAtivo = 'tudo';
+
+function filtrarPeriodo(periodo, btn) {
+  _periodoAtivo = periodo;
+  document.querySelectorAll('.periodo-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderVendas();
+}
+
+function vendasFiltradas() {
+  const agora = new Date();
+  return state.vendas.filter(v => {
+    if (_periodoAtivo === 'tudo') return true;
+    const d = new Date(v.data + 'T12:00:00');
+    if (_periodoAtivo === 'hoje') return d.toDateString() === agora.toDateString();
+    if (_periodoAtivo === 'semana') {
+      const ini = new Date(agora); ini.setDate(agora.getDate() - agora.getDay());
+      return d >= ini;
+    }
+    if (_periodoAtivo === 'mes') return d.getMonth() === agora.getMonth() && d.getFullYear() === agora.getFullYear();
+    if (_periodoAtivo === 'ano') return d.getFullYear() === agora.getFullYear();
+    return true;
+  });
+}
+
+// ============== REABASTECER ==============
+function atualizarReab() {
+  const filId = document.getElementById('reab-filamento').value;
+  const qtd = Number(document.getElementById('reab-qtd').value) || 0;
+  const atual = document.getElementById('reab-atual');
+  const preview = document.getElementById('reab-preview');
+  const histWrap = document.getElementById('reab-historico-wrap');
+  const histLista = document.getElementById('reab-historico-lista');
+
+  if (!filId) { atual.style.display='none'; preview.style.display='none'; histWrap.style.display='none'; return; }
+  const fil = state.filamentos.find(f => String(f.id) === String(filId));
+  if (!fil) return;
+
+  atual.style.display = 'block';
+  document.getElementById('reab-estoque-atual').textContent = fmtKg(fil.estoque);
+
+  if (qtd > 0) {
+    preview.style.display = 'block';
+    document.getElementById('reab-apos').textContent = fmtKg(fil.estoque + qtd);
+  } else {
+    preview.style.display = 'none';
+  }
+
+  // Histórico deste filamento
+  const hist = (state.historicoReab || []).filter(h => String(h.filamentoId) === String(filId));
+  if (hist.length > 0) {
+    histWrap.style.display = 'block';
+    histLista.innerHTML = [...hist].reverse().map(h => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(200,131,10,0.15);font-size:0.8rem;">
+        <div>
+          <span style="color:#ffffff;font-weight:600;">${fmtKg(h.qtd)}</span>
+          ${h.fornecedor ? `<span style="color:rgba(255,255,255,0.45)"> · ${h.fornecedor}</span>` : ''}
+        </div>
+        <div style="text-align:right;">
+          ${h.custo ? `<span style="font-family:'JetBrains Mono',monospace;color:#C8830A">${fmt(h.custo)}</span>` : ''}
+          <span style="color:rgba(255,255,255,0.45);margin-left:8px;">${new Date(h.data+'T12:00:00').toLocaleDateString('pt-BR')}</span>
+        </div>
+      </div>`).join('');
+  } else {
+    histWrap.style.display = 'none';
+  }
+}
+
+function salvarReabastecimento() {
+  const filId = document.getElementById('reab-filamento').value;
+  const qtd = Number(document.getElementById('reab-qtd').value) || 0;
+  const custo = Number(document.getElementById('reab-custo').value) || 0;
+  const fornecedor = document.getElementById('reab-fornecedor').value;
+  const data = document.getElementById('reab-data').value || new Date().toISOString().split('T')[0];
+
+  if (!filId) { alert('Selecione um filamento.'); return; }
+  if (!qtd) { alert('Informe a quantidade a adicionar.'); return; }
+
+  const fil = state.filamentos.find(f => String(f.id) === String(filId));
+  if (!fil) return;
+
+  fil.estoque = fil.estoque + qtd;
+
+  if (!state.historicoReab) state.historicoReab = [];
+  state.historicoReab.push({ id: genId(), filamentoId: fil.id, filamentoNome: fil.nome, qtd, custo, fornecedor, data });
+
+  saveState();
+  closeModal('modal-reabastecer');
+  renderFilamentos();
+  alert(`✅ ${fil.nome} reabastecido!\nNovo estoque: ${fmtKg(fil.estoque)}`);
+}
+
+function populateReabSelect() {
+  const el = document.getElementById('reab-filamento');
+  el.innerHTML = '<option value="">Selecione...</option>' +
+    state.filamentos.map(f => `<option value="${f.id}">${f.nome} (${f.tipo}) — ${fmtKg(f.estoque)}</option>`).join('');
+}
+
+function limparTodosDados() {
+  confirmar('Tem certeza? Isso vai apagar TODOS os dados do sistema permanentemente.\n\nFaça um backup antes se quiser guardar seus dados!', function() {
+    localStorage.removeItem('print3d_state');
+    localStorage.removeItem('print3d_version');
+    state = { filamentos:[], pecas:[], vendas:[], impressoes:[], gastos:[], orcamentos:[], historicoReab:[] };
+    saveState();
+    renderDashboard();
+    alert('✅ Dados apagados. O sistema está limpo!');
+  });
+}
+
+// ============== BACKUP E RESTAURAÇÃO ==============
+function exportarDados() {
+  const dados = JSON.stringify(state, null, 2);
+  const blob = new Blob([dados], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const data = new Date().toISOString().split('T')[0];
+  a.href = url;
+  a.download = `extreme3d-backup-${data}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importarDados(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const dados = JSON.parse(e.target.result);
+      if (!dados.filamentos || !dados.vendas) throw new Error('Arquivo inválido');
+      confirmar('Tem certeza? Isso vai substituir TODOS os seus dados atuais pelo backup.', function() {
+        state = dados;
+        if (!state.impressoes) state.impressoes = [];
+        saveState();
+        renderDashboard();
+        alert('✅ Dados restaurados com sucesso!');
+      });
+    } catch(err) {
+      alert('❌ Arquivo inválido. Use um backup gerado pelo EXTREME3D.');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+// ============== PWA SERVICE WORKER ==============
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(() => console.log('EXTREME3D: Service Worker registrado'))
+      .catch(e => console.log('SW erro:', e));
+  });
+}
+
+// ============== INIT ==============
+loadState();
+renderDashboard();
+</script>
+<!-- Modal Gasto -->
+<div class="modal-bg" id="modal-gasto">
+  <div class="modal" style="max-width:480px;">
+    <h3 id="modal-gasto-title">Registrar Gasto</h3>
+    <input type="hidden" id="gasto-edit-idx">
+    <div class="form-group">
+      <label>Descrição</label>
+      <input type="text" id="gasto-desc" placeholder="Ex: Bico 0.4mm, Bobina PLA branco, Conta de luz...">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Categoria</label>
+        <select id="gasto-cat">
+          <option value="impressora">🖨️ Impressora</option>
+          <option value="filamento">🧵 Filamento</option>
+          <option value="manutencao">🔧 Manutenção</option>
+          <option value="energia">⚡ Energia Elétrica</option>
+          <option value="embalagem">📦 Embalagem</option>
+          <option value="ferramenta">🛠️ Ferramentas</option>
+          <option value="software">💻 Software / Assinatura</option>
+          <option value="outro">📋 Outro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Valor (R$)</label>
+        <input type="number" id="gasto-valor" placeholder="0,00" min="0" step="0.01">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Data</label>
+        <input type="date" id="gasto-data">
+      </div>
+      <div class="form-group">
+        <label>Recorrente?</label>
+        <select id="gasto-recorrente">
+          <option value="nao">Não — gasto único</option>
+          <option value="mensal">Mensal</option>
+          <option value="anual">Anual</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Notas (opcional)</label>
+      <textarea id="gasto-notas" placeholder="Detalhes adicionais..."></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-gasto')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarGasto()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Preview Orçamento -->
+<div class="modal-bg" id="modal-orc-preview" style="z-index:998;">
+  <div class="modal" style="max-width:700px;padding:0;overflow:hidden;">
+    <input type="hidden" id="orc-preview-idx">
+    <!-- Barra de ações -->
+    <div style="background:rgba(255,255,255,0.06);padding:12px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(200,131,10,0.15);">
+      <span style="font-weight:700;font-size:0.9rem;">Prévia do Orçamento</span>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-primary btn-sm" onclick="imprimirOrcamento()">🖨️ Imprimir / Salvar PDF</button>
+        <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-orc-preview')">✕ Fechar</button>
+      </div>
+    </div>
+    <!-- Conteúdo -->
+    <div id="orc-preview-content" style="max-height:80vh;overflow-y:auto;border-radius:0 0 16px 16px;"></div>
+  </div>
+</div>
+
+<!-- Modal Orçamento -->
+<div class="modal-bg" id="modal-orcamento">
+  <div class="modal" style="max-width:600px;">
+    <h3 id="modal-orc-title">📄 Novo Orçamento</h3>
+    <input type="hidden" id="orc-edit-idx">
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Nome do Cliente</label>
+        <input type="text" id="orc-cliente" placeholder="Ex: João Silva">
+      </div>
+      <div class="form-group">
+        <label>Telefone / WhatsApp</label>
+        <input type="text" id="orc-telefone" placeholder="(62) 99999-9999">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Validade do Orçamento</label>
+        <input type="date" id="orc-validade">
+      </div>
+      <div class="form-group">
+        <label>Prazo de Entrega</label>
+        <input type="text" id="orc-prazo" placeholder="Ex: 5 dias úteis">
+      </div>
+    </div>
+
+    <!-- Itens do orçamento -->
+    <div style="margin-bottom:12px;">
+      <label style="display:block;font-size:0.72rem;color:rgba(255,255,255,0.45);font-weight:600;text-transform:uppercase;letter-spacing:0.7px;margin-bottom:8px;">Itens do Orçamento</label>
+      <div id="orc-itens"></div>
+      <button class="btn btn-ghost btn-sm" style="margin-top:8px;width:100%;" onclick="adicionarItemOrc()">+ Adicionar Item</button>
+    </div>
+
+    <div class="form-group">
+      <label>Observações / Condições</label>
+      <textarea id="orc-obs" placeholder="Ex: Pagamento via Pix. Frete por conta do cliente. Cores podem variar conforme estoque..."></textarea>
+    </div>
+
+    <div style="background:rgba(255,255,255,0.06);border-radius:8px;padding:14px;margin-bottom:4px;">
+      <div style="display:flex;justify-content:space-between;font-size:0.85rem;margin-bottom:6px;">
+        <span style="color:rgba(255,255,255,0.45)">Subtotal</span>
+        <span id="orc-subtotal" style="font-family:'JetBrains Mono',monospace;">R$ 0,00</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:0.85rem;margin-bottom:6px;">
+        <span style="color:rgba(255,255,255,0.45)">Desconto (R$)</span>
+        <input type="number" id="orc-desconto" value="0" min="0" step="0.01" oninput="calcOrcamento()" style="width:100px;background:rgba(255,255,255,0.04);border:1px solid rgba(200,131,10,0.2);border-radius:5px;padding:3px 8px;color:#ffffff;font-family:'JetBrains Mono',monospace;text-align:right;">
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:1rem;font-weight:800;border-top:1px solid rgba(200,131,10,0.15);padding-top:8px;margin-top:4px;">
+        <span>TOTAL</span>
+        <span id="orc-total" style="font-family:'JetBrains Mono',monospace;color:#C8830A;">R$ 0,00</span>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-orcamento')">Cancelar</button>
+      <button class="btn btn-ghost" onclick="salvarOrcamento('pendente')">💾 Salvar</button>
+      <button class="btn btn-primary" onclick="visualizarOrcamento()">👁️ Visualizar PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Reabastecer -->
+<div class="modal-bg" id="modal-reabastecer">
+  <div class="modal" style="max-width:480px;">
+    <h3>📦 Reabastecer Filamento</h3>
+    <div class="form-group">
+      <label>Filamento</label>
+      <select id="reab-filamento" onchange="atualizarReab()">
+        <option value="">Selecione...</option>
+      </select>
+    </div>
+    <div id="reab-atual" style="display:none;background:rgba(255,255,255,0.06);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:0.85rem;">
+      Estoque atual: <strong id="reab-estoque-atual">—</strong>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Quantidade a adicionar (kg)</label>
+        <input type="number" id="reab-qtd" placeholder="1" min="0" step="0.1" oninput="atualizarReab()">
+      </div>
+      <div class="form-group">
+        <label>Custo desta compra (R$)</label>
+        <input type="number" id="reab-custo" placeholder="90.00" min="0" step="0.01">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Fornecedor (opcional)</label>
+        <input type="text" id="reab-fornecedor" placeholder="Ex: Amazon, Loja X...">
+      </div>
+      <div class="form-group">
+        <label>Data da compra</label>
+        <input type="date" id="reab-data">
+      </div>
+    </div>
+    <div id="reab-preview" style="display:none;background:rgba(200,131,10,0.1);border:1px solid rgba(200,131,10,0.3);border-radius:8px;padding:12px 14px;margin-bottom:12px;font-size:0.85rem;">
+      Estoque após: <strong id="reab-apos" style="color:#C8830A">—</strong>
+    </div>
+
+    <!-- Histórico -->
+    <div id="reab-historico-wrap" style="display:none;">
+      <div style="font-size:0.72rem;color:rgba(255,255,255,0.45);font-weight:600;text-transform:uppercase;letter-spacing:0.7px;margin-bottom:8px;">Histórico de Reabastecimento</div>
+      <div id="reab-historico-lista" style="max-height:150px;overflow-y:auto;"></div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-reabastecer')">Cancelar</button>
+      <button class="btn btn-success" onclick="salvarReabastecimento()">✅ Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Confirmação -->
+<div class="modal-bg" id="modal-confirm" style="z-index:999;">
+  <div class="modal" style="max-width:380px;text-align:center;">
+    <div style="font-size:2.5rem;margin-bottom:12px;">⚠️</div>
+    <h3 style="margin-bottom:10px;">Confirmar Exclusão</h3>
+    <p id="confirm-msg" style="color:rgba(255,255,255,0.45);font-size:0.9rem;line-height:1.5;margin-bottom:24px;white-space:pre-line;"></p>
+    <div style="display:flex;gap:12px;">
+      <button onclick="fecharConfirm()" class="btn btn-ghost" style="flex:1;padding:12px;">Cancelar</button>
+      <button onclick="executarConfirm()" class="btn btn-danger" style="flex:1;padding:12px;background:var(--danger);color:#fff;border:none;">Sim, Excluir</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,33 @@
+EXTREME3D Manager — Instalação como App
+========================================
+
+PASSO A PASSO PARA INSTALAR COMO APP NO COMPUTADOR:
+
+1. COLOQUE TODOS OS ARQUIVOS NA MESMA PASTA:
+   - print3d-manager.html
+   - manifest.json
+   - sw.js
+   - icon-192.png
+   - icon-512.png
+   - extreme3d.ico (para ícone do Windows)
+
+2. ABRA NO GOOGLE CHROME ou MICROSOFT EDGE
+   - Arraste o arquivo print3d-manager.html para o navegador
+   - OU clique duas vezes nele
+
+3. INSTALE COMO APP:
+   No Chrome:
+   - Olhe na barra de endereços — aparecerá um ícone de instalar (➕ ou computador)
+   - Clique nele e depois em "Instalar"
+
+   No Edge:
+   - Clique nos 3 pontinhos (···) no canto superior direito
+   - Clique em "Apps" → "Instalar este site como um aplicativo"
+   - Clique em "Instalar"
+
+4. PRONTO!
+   - O EXTREME3D aparece na área de trabalho e barra de tarefas
+   - Abre sem barra do navegador, igual a um app de verdade
+   - Funciona offline também!
+
+ATENÇÃO: Todos os 5 arquivos precisam estar na MESMA PASTA.
